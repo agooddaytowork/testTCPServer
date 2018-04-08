@@ -1,4 +1,5 @@
 #include "simpleserialinterface.h"
+#include <QDebug>
 
 SimpleSerialInterface::SimpleSerialInterface(QObject *parent): mSerialPort(parent), mPortName("COM1"), mBaudrate(9600),QObject(parent)
 {

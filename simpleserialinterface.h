@@ -3,7 +3,6 @@
 
 #include <QSerialPort>
 #include <QSerialPortInfo>
-#include "shared/commonthings.h"
 #include <QMap>
 
 class SimpleSerialInterface: public QObject
