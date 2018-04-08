@@ -30,7 +30,16 @@ int main(int argc, char *argv[])
         {
             asimpleSerialInterface.setBaudRate(9600);
             asimpleSerialInterface.setPortName("tyyS0");
-            asimpleSerialInterface.connect();
+
+            if(asimpleSerialInterface.connect())
+            {
+                qDebug << "Serial connected";
+
+            }
+            else
+            {
+                qDebug << "Serial failed to Connect";
+            }
         }
 
     }

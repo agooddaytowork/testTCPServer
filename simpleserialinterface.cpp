@@ -74,6 +74,7 @@ void SimpleSerialInterface::input(const QByteArray &input)
 
     if(mSerialPort.isOpen())
     {
+        qDebug() << "writing to Serial";
         mSerialPort.write(input);
     }
 
@@ -97,4 +98,5 @@ void SimpleSerialInterface::receivedDataHandler()
 void SimpleSerialInterface::serialPortErrorHandler(const QSerialPort::SerialPortError &error)
 {
 
+    qDebug() << "Serial ERRORRR";
 }
