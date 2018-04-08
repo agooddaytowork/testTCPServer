@@ -29,7 +29,7 @@ public slots:
     Q_INVOKABLE void setBaudRate(const quint16 &baudrate);
     Q_INVOKABLE bool connect();
     Q_INVOKABLE bool disconnect();
-    Q_INVOKABLE void input(const QByteArray &input);
+     void input(const QByteArray &input);
 
 private slots:
     void receivedDataHandler();

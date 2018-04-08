@@ -19,11 +19,15 @@ fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new 
 
 void fountainServer::newConnectionHandler()
 {
-     tcpSocket = tcpServer->nextPendingConnection();
-     in.setDevice(tcpSocket);
+
+    clientList.append(tcpServer->nextPendingConnection());
+
+//     tcpSocket = tcpServer->nextPendingConnection();
+     in.setDevice(clientList.last());
      in.setVersion(QDataStream::Qt_5_8);
 
-    connect(tcpSocket, SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
+    connect(clientList.last(), SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
+
 
 }
 
@@ -53,4 +57,27 @@ void fountainServer::readyReadHandler()
     emit toSerial(QByteArray::fromHex(testOboject["ProgramData"].toString().toUtf8()));
 #endif
 
+}
+
+
+//void fountainServer::returnDataToClient(const QByteArray &data)
+//{
+
+//    QByteArray block;
+
+//    QDataStream out(&block, QIODevice::WriteOnly);
+//    out.setVersion(QDataStream::Qt_5_8);
+//    out << data;
+//    tcpSocket->write(block);
+//}
+
+void fountainServer::fromSerialHandler(const QByteArray &data)
+{
+    foreach (QTcpSocket* theClient, clientList) {
+            QByteArray block;
+            QDataStream out(&block, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_5_8);
+            out << data;
+            theClient->write(block);
+    }
 }

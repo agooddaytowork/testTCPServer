@@ -53,7 +53,7 @@ bool SimpleSerialInterface::connect()
         emit connected();
 
     }
-return true;
+    return true;
 }
 
 bool SimpleSerialInterface::disconnect()
@@ -70,8 +70,13 @@ bool SimpleSerialInterface::disconnect()
 
 void SimpleSerialInterface::input(const QByteArray &input)
 {
-    qDebug() << input;
-    mSerialPort.write(input);
+    //    qDebug() << input;
+
+    if(mSerialPort.isOpen())
+    {
+        mSerialPort.write(input);
+    }
+
 }
 
 void SimpleSerialInterface::receivedDataHandler()
