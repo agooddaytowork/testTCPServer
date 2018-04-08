@@ -26,24 +26,24 @@ int main(int argc, char *argv[])
     QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::output,&aServer,&fountainServer::fromSerialHandler);
     foreach (QSerialPortInfo port, QSerialPortInfo::availablePorts()) {
         qDebug() << port.portName();
-        if(port.portName() == "tyyS0")
+        if(port.portName() == "ttyS0")
         {
+            asimpleSerialInterface.setBaudRate(9600);
+            asimpleSerialInterface.setPortName("ttyS0");
 
+            if(asimpleSerialInterface.connect())
+            {
+                qDebug() << "Serial connected";
+
+            }
+            else
+            {
+                qDebug() << "Serial failed to Connect";
+            }
         }
 
     }
 
-    asimpleSerialInterface.setBaudRate(9600);
-    asimpleSerialInterface.setPortName("tyyS0");
 
-    if(asimpleSerialInterface.connect())
-    {
-        qDebug() << "Serial connected";
-
-    }
-    else
-    {
-        qDebug() << "Serial failed to Connect";
-    }
     return a.exec();
 }
