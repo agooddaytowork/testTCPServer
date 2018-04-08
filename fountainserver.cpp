@@ -1,27 +1,56 @@
 #include "fountainserver.h"
+#include <QTextCodec>
 #include <QTcpSocket>
 
-fountainServer::fountainServer(QObject *parent): QObject(parent)
+#include <QJsonDocument>
+#include <QJsonObject>
+
+fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this))
 {
 
     tcpServer = new QTcpServer(this);
 
-    if(tcpServer->listen(QHostAddress("192.168.1.34"),5050))
+    if(tcpServer->listen(QHostAddress(QHostAddress::Any),8080))
     {
         qDebug() << "DZOO";
         connect(tcpServer,SIGNAL(newConnection()),this,SLOT(newConnectionHandler()));
     }
-
-    qDebug() << "deo dzo";
-
-
 }
 
 void fountainServer::newConnectionHandler()
 {
+     tcpSocket = tcpServer->nextPendingConnection();
+     in.setDevice(tcpSocket);
+     in.setVersion(QDataStream::Qt_5_8);
 
-    QTcpSocket *clientConnection = tcpServer->nextPendingConnection();
+    connect(tcpSocket, SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
 
-    qDebug()<< clientConnection->readAll();
+}
+
+void fountainServer::readyReadHandler()
+{
+
+    in.startTransaction();
+
+    QByteArray nextFortune;
+    in >> nextFortune;
+
+    QJsonDocument aDocument(QJsonDocument::fromJson(nextFortune));
+
+    QJsonObject testOboject = aDocument.object();
+
+    QByteArray cc;
+    cc.append(testOboject["ProgramData"].toString());
+
+#if fountainServerDebug
+    qDebug() << testOboject["ProgramName"].toString();
+    qDebug() << QByteArray::fromHex(testOboject["ProgramData"].toString().toUtf8());
+
+#endif
+
+#if fountainDeviceMode
+   // qDebug() << nextFortune;
+    emit toSerial(QByteArray::fromHex(testOboject["ProgramData"].toString().toUtf8()));
+#endif
 
 }
