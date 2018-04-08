@@ -29,6 +29,9 @@ void fountainServer::newConnectionHandler()
     connect(clientList.last(), SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
 
 
+    clientList.last()->write(m_currentProgram);
+
+
 }
 
 void fountainServer::readyReadHandler()
@@ -53,6 +56,8 @@ void fountainServer::readyReadHandler()
 #endif
 
 #if fountainDeviceMode
+
+    m_currentProgram = testOboject["ProgramName"].toString();
    // qDebug() << nextFortune;
     emit toSerial(QByteArray::fromHex(testOboject["ProgramData"].toString().toUtf8()));
 #endif

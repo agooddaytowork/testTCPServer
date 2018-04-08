@@ -24,6 +24,8 @@ class fountainServer: public QObject
 
       QList<QTcpSocket*> clientList;
 
+      QString m_currentProgram;
+
 public:
     fountainServer(QObject *parent = nullptr);
 
