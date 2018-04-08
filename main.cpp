@@ -28,20 +28,22 @@ int main(int argc, char *argv[])
         qDebug() << port.portName();
         if(port.portName() == "tyyS0")
         {
-            asimpleSerialInterface.setBaudRate(9600);
-            asimpleSerialInterface.setPortName("tyyS0");
 
-            if(asimpleSerialInterface.connect())
-            {
-                qDebug << "Serial connected";
-
-            }
-            else
-            {
-                qDebug << "Serial failed to Connect";
-            }
         }
 
+    }
+
+    asimpleSerialInterface.setBaudRate(9600);
+    asimpleSerialInterface.setPortName("tyyS0");
+
+    if(asimpleSerialInterface.connect())
+    {
+        qDebug() << "Serial connected";
+
+    }
+    else
+    {
+        qDebug() << "Serial failed to Connect";
     }
     return a.exec();
 }
