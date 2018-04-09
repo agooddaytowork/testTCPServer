@@ -1,11 +1,11 @@
 #include "fountainserver.h"
 #include <QTextCodec>
 #include <QTcpSocket>
-
 #include <QJsonDocument>
 #include <QJsonObject>
+#include "tcppackager.h"
 
-fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this))
+fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this)), m_isFountainOnline(false)
 {
 
     tcpServer = new QTcpServer(this);
@@ -17,20 +17,47 @@ fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new 
     }
 }
 
+void fountainServer::setIsFountainOnline(const bool &input)
+{
+    if(m_isFountainOnline != input)
+    {
+        m_isFountainOnline = input;
+        informClientFountainStatus();
+    }
+}
+
+void fountainServer::informClientFountainStatus()
+{
+    sendTcpPackageToClients(tcpPackager::fountainStatus(m_isFountainOnline));
+}
+
+void fountainServer::informClientCurrentPlayingProgram()
+{
+    sendTcpPackageToClients(tcpPackager::fountainCurrentPlayingProgram(m_currentProgram));
+}
+
+void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
+{
+    foreach (QTcpSocket* theClient, clientList) {
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_8);
+        out << tcpPackage;
+        theClient->write(block);
+    }
+}
+
 void fountainServer::newConnectionHandler()
 {
 
     clientList.append(tcpServer->nextPendingConnection());
 
-//     tcpSocket = tcpServer->nextPendingConnection();
-     in.setDevice(clientList.last());
-     in.setVersion(QDataStream::Qt_5_8);
+    //     tcpSocket = tcpServer->nextPendingConnection();
+    in.setDevice(clientList.last());
+    in.setVersion(QDataStream::Qt_5_8);
 
     connect(clientList.last(), SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
-
-
-    clientList.last()->write(m_currentProgram);
-
+    informClientFountainStatus();
 
 }
 
@@ -39,28 +66,40 @@ void fountainServer::readyReadHandler()
 
     in.startTransaction();
 
-    QByteArray nextFortune;
-    in >> nextFortune;
+    QByteArray requestFromClient;
 
-    QJsonDocument aDocument(QJsonDocument::fromJson(nextFortune));
+    in >> requestFromClient;
 
-    QJsonObject testOboject = aDocument.object();
+    if(tcpPackager::isPackageValid(requestFromClient))
+    {
+        QJsonObject requestJsonObject = tcpPackager::packageToJson(requestFromClient);
 
-    QByteArray cc;
-    cc.append(testOboject["ProgramData"].toString());
+        QString theCommand = requestJsonObject["Command"].toString();
 
+        if(theCommand == "playProgram")
+        {
 #if fountainServerDebug
-    qDebug() << testOboject["ProgramName"].toString();
-    qDebug() << QByteArray::fromHex(testOboject["ProgramData"].toString().toUtf8());
+            qDebug() << requestJsonObject["ProgramName"].toString();
+            qDebug() << QByteArray::fromHex(requestJsonObject["ProgramData"].toString().toUtf8());
 
 #endif
 
 #if fountainDeviceMode
 
-    m_currentProgram = testOboject["ProgramName"].toString();
-   // qDebug() << nextFortune;
-    emit toSerial(QByteArray::fromHex(testOboject["ProgramData"].toString().toUtf8()));
+            m_currentProgram = requestJsonObject["ProgramName"].toString();
+            // qDebug() << nextFortune;
+            emit toSerial(QByteArray::fromHex(requestJsonObject["ProgramData"].toString().toUtf8()));
+            informClientCurrentPlayingProgram();
 #endif
+
+        }
+        else if (theCommand == "isFountainOnline") {
+
+            informClientFountainStatus();
+        }
+
+
+    }
 
 }
 
@@ -78,11 +117,15 @@ void fountainServer::readyReadHandler()
 
 void fountainServer::fromSerialHandler(const QByteArray &data)
 {
-    foreach (QTcpSocket* theClient, clientList) {
-            QByteArray block;
-            QDataStream out(&block, QIODevice::WriteOnly);
-            out.setVersion(QDataStream::Qt_5_8);
-            out << data;
-            theClient->write(block);
-    }
+    sendTcpPackageToClients(tcpPackager::fountainResponse(data));
+}
+
+void fountainServer::serialConnectedHandler()
+{
+    setIsFountainOnline(true);
+}
+
+void fountainServer::serialDisconnectedHandler()
+{
+    setIsFountainOnline(false);
 }

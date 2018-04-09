@@ -16,14 +16,20 @@ int main(int argc, char *argv[])
     QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::connected,[=](){
 
         qDebug() << "Serial Connected";
-    });
 
+    });
     QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::errorsOcurred,[=](){
 
         qDebug() << "Serial Error Occured";
     });
+    QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::connected,&aServer,&fountainServer::serialConnectedHandler);
+    QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::disconnected,&aServer,&fountainServer::serialDisconnectedHandler);
+    QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::errorsOcurred,&aServer,&fountainServer::serialDisconnectedHandler);
+
+
 
     QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::output,&aServer,&fountainServer::fromSerialHandler);
+
     foreach (QSerialPortInfo port, QSerialPortInfo::availablePorts()) {
         qDebug() << port.portName();
         if(port.portName() == "ttyS0")

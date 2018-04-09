@@ -25,17 +25,25 @@ class fountainServer: public QObject
       QList<QTcpSocket*> clientList;
 
       QString m_currentProgram;
+      bool m_isFountainOnline;
 
 public:
     fountainServer(QObject *parent = nullptr);
+    void setIsFountainOnline(const bool &input);
+    void informClientFountainStatus();
+    void informClientCurrentPlayingProgram();
+
+    void sendTcpPackageToClients(const QByteArray &tcpPackage);
 
 public slots:
 
     void newConnectionHandler();
     void fromSerialHandler(const QByteArray &data);
+    void serialConnectedHandler();
 
 private slots:
     void readyReadHandler();
+    void clientDisconnectionHandler();
 
 
 signals:
