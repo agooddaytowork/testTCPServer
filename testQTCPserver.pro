@@ -18,9 +18,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp \
     fountainserver.cpp \
     simpleserialinterface.cpp \
-    tcppackager.cpp
+    tcppackager.cpp \
+    clienttcpsocket.cpp
 
 HEADERS += \
     fountainserver.h \
     simpleserialinterface.h \
-    tcppackager.h
+    tcppackager.h \
+    clienttcpsocket.h

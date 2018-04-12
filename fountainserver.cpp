@@ -38,7 +38,7 @@ void fountainServer::informClientCurrentPlayingProgram()
 
 void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
 {
-    foreach (QTcpSocket* theClient, clientList) {
+    foreach (clientTcpSocket* theClient, clientList) {
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_8);
@@ -50,7 +50,9 @@ void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
 void fountainServer::newConnectionHandler()
 {
 
-    clientList.append(tcpServer->nextPendingConnection());
+    clientList.append((clientTcpSocket*)tcpServer->nextPendingConnection());
+
+//    clientList.append(static_cast<clientTcpSocket*);
 
     //     tcpSocket = tcpServer->nextPendingConnection();
     in.setDevice(clientList.last());

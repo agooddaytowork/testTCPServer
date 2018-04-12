@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QDataStream>
 #include <QList>
+#include "clienttcpsocket.h"
 
 #define fountainServerDebug (1)
 #define fountainServerForwarder (0)
@@ -22,7 +23,7 @@ class fountainServer: public QObject
     int m_Serverport;
       QDataStream in;
 
-      QList<QTcpSocket*> clientList;
+      QList<clientTcpSocket*> clientList;
 
       QString m_currentProgram;
       bool m_isFountainOnline;
@@ -40,10 +41,11 @@ public slots:
     void newConnectionHandler();
     void fromSerialHandler(const QByteArray &data);
     void serialConnectedHandler();
+    void serialDisconnectedHandler();
 
 private slots:
     void readyReadHandler();
-    void clientDisconnectionHandler();
+//    void clientDisconnectionHandler();
 
 
 signals:
