@@ -1,21 +1,20 @@
 #include "clienttcpsocket.h"
 
-clientTcpSocket::clientTcpSocket(QTcpSocket *parent): QTcpSocket(parent), m_UUID(""), m_Type(0),m_isControlling(false), m_isMainController(false)
+clientTcpSocket::clientTcpSocket(): m_Type(0),m_isControlling(false), m_isMainController(false), m_ClientId("")
 {
 
 }
 
-void clientTcpSocket::setUUID(const QString &id)
+void clientTcpSocket::setClientId(const QString &id)
 {
- if(id != m_UUID)
- {
-     m_UUID =id;
- }
+
+     m_ClientId = id;
+
 }
 
-QString  clientTcpSocket::getUUID() const
+QString  clientTcpSocket::getClientId() const
 {
-    return m_UUID;
+    return m_ClientId;
 }
 
 void clientTcpSocket::setClientType(const int &type)
@@ -31,4 +30,16 @@ int clientTcpSocket::getClientType() const
     return m_Type;
 }
 
+bool clientTcpSocket::isControlling() const
+{
+    return m_isControlling;
+}
+
+void clientTcpSocket::setIsControlling(const bool &control)
+{
+    if(m_isControlling != control)
+    {
+        m_isControlling = control;
+    }
+}
 

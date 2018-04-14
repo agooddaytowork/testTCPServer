@@ -1,6 +1,6 @@
 #include "fountainserver.h"
 #include <QTextCodec>
-#include <QTcpSocket>
+#include "clienttcpsocket.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include "tcppackager.h"
@@ -15,6 +15,8 @@ fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new 
         qDebug() << "DZOO";
         connect(tcpServer,SIGNAL(newConnection()),this,SLOT(newConnectionHandler()));
     }
+
+    QObject::connect(this,SIGNAL(stillAvailable()),this,SLOT(readyReadHandler()));
 }
 
 void fountainServer::setIsFountainOnline(const bool &input)
@@ -38,7 +40,7 @@ void fountainServer::informClientCurrentPlayingProgram()
 
 void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
 {
-    foreach (clientTcpSocket* theClient, clientList) {
+    foreach (QTcpSocket* theClient, tcpSocketList) {
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_8);
@@ -50,15 +52,15 @@ void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
 void fountainServer::newConnectionHandler()
 {
 
-    clientList.append((clientTcpSocket*)tcpServer->nextPendingConnection());
+    tcpSocketList.append(tcpServer->nextPendingConnection());
 
-//    clientList.append(static_cast<clientTcpSocket*);
+    //    tcpSocketList.append(static_cast<clientTcpSocket*);
 
     //     tcpSocket = tcpServer->nextPendingConnection();
-    in.setDevice(clientList.last());
+    in.setDevice(tcpSocketList.last());
     in.setVersion(QDataStream::Qt_5_8);
 
-    connect(clientList.last(), SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
+    connect(tcpSocketList.last(), SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
     informClientFountainStatus();
 
 }
@@ -96,20 +98,69 @@ void fountainServer::readyReadHandler()
 
         }
         else if (theCommand == "isFountainOnline") {
+#if fountainServerDebug
+            qDebug() << "isFountainOnline Request";
 
+#endif
             informClientFountainStatus();
         }
-        else if(theCommand =="whoIsControlling")
+        else if(theCommand =="addNewClient")
         {
-            if(!isClientExist(requestJsonObject["ClientId"].toString()))
-            {
+#if fountainServerDebug
+            qDebug() << "addNewClient Request";
 
+#endif
+            clientTcpSocket aClient;
+
+            if(clientList.count() == 0) aClient.setIsControlling(true);
+
+            aClient.setClientId(requestJsonObject["ClientId"].toString());
+            aClient.setClientType(requestJsonObject["ClientType"].toInt());
+            clientList.append(aClient);
+
+            sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(clientList.last().getClientId(), clientList.last().getClientType()));
+
+        }
+        else if(theCommand == "whoIsControlling")
+        {
+#if fountainServerDebug
+            qDebug() << "whoIsControlling Request";
+
+#endif
+            foreach (clientTcpSocket theClient, clientList) {
+                if(theClient.isControlling())
+                {
+                    sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+
+                }
             }
         }
+        else if(theCommand == "getControlPermission")
+        {
 
+#if fountainServerDebug
+            qDebug() << "getControlPermission Request";
 
+#endif
+            foreach (clientTcpSocket theClient, clientList) {
+
+                if(theClient.getClientId() != requestJsonObject["ClientId"].toString())
+                {
+                    theClient.setIsControlling(false);
+                }
+                else
+                {
+                    theClient.setIsControlling(true);
+                    sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+                }
+            }
+        }
     }
 
+        if(tcpSocketList.last()->bytesAvailable()>0)
+        {
+            emit stillAvailable();
+        }
 }
 
 
@@ -141,9 +192,9 @@ void fountainServer::serialDisconnectedHandler()
 
 bool fountainServer::isClientExist(const QString &id)
 {
-    foreach (clientTcpSocket* theClient, clientList) {
+    foreach (clientTcpSocket theClient, clientList) {
 
-        if(theClient->getUUID() == id)
+        if(theClient.getClientId() == id)
         {
             return true;
         }

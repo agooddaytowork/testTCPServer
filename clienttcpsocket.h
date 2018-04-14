@@ -4,24 +4,24 @@
 #include <QObject>
 #include <QTcpSocket>
 
-class clientTcpSocket: public QTcpSocket
+class clientTcpSocket
 {
 
-    Q_OBJECT
-
-    QString m_UUID;
+    QString m_ClientId;
     int     m_Type;
     bool m_isControlling;
     bool m_isMainController;
-
 public:
-    clientTcpSocket(QTcpSocket *parent = nullptr);
-    void setUUID(const QString &id);
-    QString getUUID() const;
+
+    clientTcpSocket();
+    void setClientId(const QString &id);
+    QString getClientId() const;
     void setClientType(const int &type);
     int getClientType() const;
 
-    bool isClientExist(const QString &id);
+
+    bool isControlling() const;
+    void setIsControlling(const bool &control);
 };
 
 #endif // CLIENTTCPSOCKET_H

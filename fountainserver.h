@@ -23,7 +23,8 @@ class fountainServer: public QObject
     int m_Serverport;
     QDataStream in;
 
-    QList<clientTcpSocket*> clientList;
+    QList<QTcpSocket*> tcpSocketList;
+    QList<clientTcpSocket> clientList;
 
     QString m_currentProgram;
     bool m_isFountainOnline;
@@ -52,6 +53,7 @@ private slots:
 signals:
 
     void toSerial(QByteArray);
+    void stillAvailable();
 
 };
 
