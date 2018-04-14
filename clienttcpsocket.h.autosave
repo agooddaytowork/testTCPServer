@@ -21,7 +21,7 @@ public:
     void setClientType(const int &type);
     int getClientType() const;
 
-    bool isClientExist(const QString &id);
+  
 };
 
 #endif // CLIENTTCPSOCKET_H

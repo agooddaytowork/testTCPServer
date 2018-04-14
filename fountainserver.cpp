@@ -99,6 +99,13 @@ void fountainServer::readyReadHandler()
 
             informClientFountainStatus();
         }
+        else if(theCommand =="whoIsControlling")
+        {
+            if(!isClientExist(requestJsonObject["ClientId"].toString()))
+            {
+
+            }
+        }
 
 
     }
@@ -130,4 +137,18 @@ void fountainServer::serialConnectedHandler()
 void fountainServer::serialDisconnectedHandler()
 {
     setIsFountainOnline(false);
+}
+
+bool fountainServer::isClientExist(const QString &id)
+{
+    foreach (clientTcpSocket* theClient, clientList) {
+
+        if(theClient->getUUID() == id)
+        {
+            return true;
+        }
+
+    }
+
+    return false;
 }

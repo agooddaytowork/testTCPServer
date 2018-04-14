@@ -21,12 +21,13 @@ class fountainServer: public QObject
     QTcpServer *tcpServer = nullptr;
     QTcpSocket *tcpSocket = nullptr;
     int m_Serverport;
-      QDataStream in;
+    QDataStream in;
 
-      QList<clientTcpSocket*> clientList;
+    QList<clientTcpSocket*> clientList;
 
-      QString m_currentProgram;
-      bool m_isFountainOnline;
+    QString m_currentProgram;
+    bool m_isFountainOnline;
+    bool isClientExist(const QString &id);
 
 public:
     fountainServer(QObject *parent = nullptr);
@@ -45,7 +46,7 @@ public slots:
 
 private slots:
     void readyReadHandler();
-//    void clientDisconnectionHandler();
+    //    void clientDisconnectionHandler();
 
 
 signals:
