@@ -11,6 +11,7 @@
 #define fountainServerDebug (1)
 #define fountainServerForwarder (0)
 #define fountainDeviceMode (1)
+#include <QTimer>
 
 
 class fountainServer: public QObject
@@ -27,8 +28,10 @@ class fountainServer: public QObject
     QList<clientTcpSocket> clientList;
 
     QString m_currentProgram;
+    QString m_currentClientAddress;
     bool m_isFountainOnline;
     bool isClientExist(const QString &id);
+
 
 public:
     fountainServer(QObject *parent = nullptr);
@@ -44,6 +47,8 @@ public slots:
     void fromSerialHandler(const QByteArray &data);
     void serialConnectedHandler();
     void serialDisconnectedHandler();
+    void clientDisconnectedHandler();
+
 
 private slots:
     void readyReadHandler();

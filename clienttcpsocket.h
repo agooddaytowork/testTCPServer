@@ -11,6 +11,7 @@ class clientTcpSocket
     int     m_Type;
     bool m_isControlling;
     bool m_isMainController;
+    QString m_Address;
 public:
 
     clientTcpSocket();
@@ -18,6 +19,9 @@ public:
     QString getClientId() const;
     void setClientType(const int &type);
     int getClientType() const;
+
+    void setClientAddress(const QString &address);
+    QString getClientAddress() const;
 
 
     bool isControlling() const;

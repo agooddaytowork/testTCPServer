@@ -43,3 +43,13 @@ void clientTcpSocket::setIsControlling(const bool &control)
     }
 }
 
+QString clientTcpSocket::getClientAddress() const
+{
+    return m_Address;
+}
+
+void clientTcpSocket::setClientAddress(const QString &address)
+{
+    m_Address = address;
+}
+

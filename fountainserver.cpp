@@ -5,7 +5,7 @@
 #include <QJsonObject>
 #include "tcppackager.h"
 
-fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this)), m_isFountainOnline(false)
+fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this)), m_isFountainOnline(false), m_currentClientAddress("")
 {
 
     tcpServer = new QTcpServer(this);
@@ -17,6 +17,7 @@ fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new 
     }
 
     QObject::connect(this,SIGNAL(stillAvailable()),this,SLOT(readyReadHandler()));
+
 }
 
 void fountainServer::setIsFountainOnline(const bool &input)
@@ -40,6 +41,8 @@ void fountainServer::informClientCurrentPlayingProgram()
 
 void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
 {
+
+
     foreach (QTcpSocket* theClient, tcpSocketList) {
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
@@ -47,28 +50,48 @@ void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
         out << tcpPackage;
         theClient->write(block);
     }
+
+
 }
 
 void fountainServer::newConnectionHandler()
 {
 
-    tcpSocketList.append(tcpServer->nextPendingConnection());
+    QTcpSocket* newClient = tcpServer->nextPendingConnection();
+
+    tcpSocketList.append(newClient);
+
+    qDebug() << "tcpSocketList count: " + QString::number(tcpSocketList.count());
 
     //    tcpSocketList.append(static_cast<clientTcpSocket*);
 
     //     tcpSocket = tcpServer->nextPendingConnection();
-    in.setDevice(tcpSocketList.last());
+    in.setDevice(newClient);
     in.setVersion(QDataStream::Qt_5_8);
 
-    connect(tcpSocketList.last(), SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
+
+    connect(newClient, SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
+    connect(newClient,SIGNAL(disconnected()),this,SLOT(clientDisconnectedHandler()));
     informClientFountainStatus();
 
+}
+
+void fountainServer::clientDisconnectedHandler(){
+
+    if(auto client = dynamic_cast<QTcpSocket *>(sender()))
+    {
+        tcpSocketList.removeAll(client);
+    }
 }
 
 void fountainServer::readyReadHandler()
 {
 
+
+
+
     in.startTransaction();
+
 
     QByteArray requestFromClient;
 
@@ -110,20 +133,28 @@ void fountainServer::readyReadHandler()
             qDebug() << "addNewClient Request";
 
 #endif
+            bool clientExist = false;
+            if(clientList.count() != 0)
+            {
+                foreach (clientTcpSocket theClient, clientList) {
+                    if(theClient.getClientId() == requestJsonObject["ClientId"].toString()) clientExist = true;
+                }
+            }
+            if(!clientExist)
+            {
+                clientTcpSocket aClient;
 
-//            foreach (clientTcpSocket theClient, clientList) {
-//                if(theClient.getClientId() == requestJsonObject["ClientId"].toString()) return;
-//            }
+                if(clientList.count() == 0) aClient.setIsControlling(true);
 
-            clientTcpSocket aClient;
+                aClient.setClientId(requestJsonObject["ClientId"].toString());
+                aClient.setClientType(requestJsonObject["ClientType"].toInt());
+                aClient.setClientAddress(m_currentClientAddress);
+                clientList.append(aClient);
+            }
 
-            if(clientList.count() == 0) aClient.setIsControlling(true);
 
-            aClient.setClientId(requestJsonObject["ClientId"].toString());
-            aClient.setClientType(requestJsonObject["ClientType"].toInt());
-            clientList.append(aClient);
 
-//            sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(clientList.last().getClientId(), clientList.last().getClientType()));
+            //            sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(clientList.last().getClientId(), clientList.last().getClientType()));
 
         }
         else if(theCommand == "whoIsControlling")
@@ -162,10 +193,11 @@ void fountainServer::readyReadHandler()
         }
     }
 
-        if(tcpSocketList.last()->bytesAvailable()>0)
-        {
-            emit stillAvailable();
-        }
+
+
+    if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();
+
+
 }
 
 
