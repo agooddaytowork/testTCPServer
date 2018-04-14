@@ -110,6 +110,11 @@ void fountainServer::readyReadHandler()
             qDebug() << "addNewClient Request";
 
 #endif
+
+//            foreach (clientTcpSocket theClient, clientList) {
+//                if(theClient.getClientId() == requestJsonObject["ClientId"].toString()) return;
+//            }
+
             clientTcpSocket aClient;
 
             if(clientList.count() == 0) aClient.setIsControlling(true);
@@ -118,7 +123,7 @@ void fountainServer::readyReadHandler()
             aClient.setClientType(requestJsonObject["ClientType"].toInt());
             clientList.append(aClient);
 
-            sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(clientList.last().getClientId(), clientList.last().getClientType()));
+//            sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(clientList.last().getClientId(), clientList.last().getClientType()));
 
         }
         else if(theCommand == "whoIsControlling")
