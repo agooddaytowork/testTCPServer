@@ -63,6 +63,10 @@ void fountainServer::newConnectionHandler()
 
     qDebug() << "tcpSocketList count: " + QString::number(tcpSocketList.count());
 
+
+
+        in.setDevice(newClient);
+        in.setVersion(QDataStream::Qt_5_8);
     //    tcpSocketList.append(static_cast<clientTcpSocket*);
 
     //     tcpSocket = tcpServer->nextPendingConnection();
@@ -87,120 +91,113 @@ void fountainServer::clientDisconnectedHandler(){
 void fountainServer::readyReadHandler()
 {
 
-    if(auto theClient = dynamic_cast<QTcpSocket *>(sender()))
-    {
-        QDataStream in;
-
-     in.setDevice(theClient);
-     in.setVersion(QDataStream::Qt_5_8);
-
-     in.startTransaction();
 
 
-     QByteArray requestFromClient;
+        in.startTransaction();
 
-     in >> requestFromClient;
 
-     if(tcpPackager::isPackageValid(requestFromClient))
-     {
-         QJsonObject requestJsonObject = tcpPackager::packageToJson(requestFromClient);
+        QByteArray requestFromClient;
 
-         QString theCommand = requestJsonObject["Command"].toString();
+        in >> requestFromClient;
 
-         if(theCommand == "playProgram")
-         {
- #if fountainServerDebug
-             qDebug() << requestJsonObject["ProgramName"].toString();
-             qDebug() << QByteArray::fromHex(requestJsonObject["ProgramData"].toString().toUtf8());
+        if(tcpPackager::isPackageValid(requestFromClient))
+        {
+            QJsonObject requestJsonObject = tcpPackager::packageToJson(requestFromClient);
 
- #endif
+            QString theCommand = requestJsonObject["Command"].toString();
 
- #if fountainDeviceMode
+            if(theCommand == "playProgram")
+            {
+    #if fountainServerDebug
+                qDebug() << requestJsonObject["ProgramName"].toString();
+                qDebug() << QByteArray::fromHex(requestJsonObject["ProgramData"].toString().toUtf8());
 
-             m_currentProgram = requestJsonObject["ProgramName"].toString();
-             // qDebug() << nextFortune;
-             emit toSerial(QByteArray::fromHex(requestJsonObject["ProgramData"].toString().toUtf8()));
-             informClientCurrentPlayingProgram();
- #endif
+    #endif
 
-         }
-         else if (theCommand == "isFountainOnline") {
- #if fountainServerDebug
-             qDebug() << "isFountainOnline Request";
+    #if fountainDeviceMode
 
- #endif
-             informClientFountainStatus();
-         }
-         else if(theCommand =="addNewClient")
-         {
- #if fountainServerDebug
-             qDebug() << "addNewClient Request";
+                m_currentProgram = requestJsonObject["ProgramName"].toString();
+                // qDebug() << nextFortune;
+                emit toSerial(QByteArray::fromHex(requestJsonObject["ProgramData"].toString().toUtf8()));
+                informClientCurrentPlayingProgram();
+    #endif
 
- #endif
-             bool clientExist = false;
-             if(clientList.count() != 0)
-             {
-                 foreach (clientTcpSocket theClient, clientList) {
-                     if(theClient.getClientId() == requestJsonObject["ClientId"].toString()) clientExist = true;
-                 }
-             }
-             if(!clientExist)
-             {
-                 clientTcpSocket aClient;
+            }
+            else if (theCommand == "isFountainOnline") {
+    #if fountainServerDebug
+                qDebug() << "isFountainOnline Request";
 
-                 if(clientList.count() == 0) aClient.setIsControlling(true);
+    #endif
+                informClientFountainStatus();
+            }
+            else if(theCommand =="addNewClient")
+            {
+    #if fountainServerDebug
+                qDebug() << "addNewClient Request";
 
-                 aClient.setClientId(requestJsonObject["ClientId"].toString());
-                 aClient.setClientType(requestJsonObject["ClientType"].toInt());
-                 aClient.setClientAddress(m_currentClientAddress);
-                 clientList.append(aClient);
-             }
+    #endif
+                bool clientExist = false;
+                if(clientList.count() != 0)
+                {
+                    foreach (clientTcpSocket theClient, clientList) {
+                        if(theClient.getClientId() == requestJsonObject["ClientId"].toString()) clientExist = true;
+                    }
+                }
+                if(!clientExist)
+                {
+                    clientTcpSocket aClient;
+
+                    if(clientList.count() == 0) aClient.setIsControlling(true);
+
+                    aClient.setClientId(requestJsonObject["ClientId"].toString());
+                    aClient.setClientType(requestJsonObject["ClientType"].toInt());
+                    aClient.setClientAddress(m_currentClientAddress);
+                    clientList.append(aClient);
+                }
 
 
 
-             //            sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(clientList.last().getClientId(), clientList.last().getClientType()));
+                //            sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(clientList.last().getClientId(), clientList.last().getClientType()));
 
-         }
-         else if(theCommand == "whoIsControlling")
-         {
- #if fountainServerDebug
-             qDebug() << "whoIsControlling Request";
+            }
+            else if(theCommand == "whoIsControlling")
+            {
+    #if fountainServerDebug
+                qDebug() << "whoIsControlling Request";
 
- #endif
-             foreach (clientTcpSocket theClient, clientList) {
-                 if(theClient.isControlling())
-                 {
-                     sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+    #endif
+                foreach (clientTcpSocket theClient, clientList) {
+                    if(theClient.isControlling())
+                    {
+                        sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
 
-                 }
-             }
-         }
-         else if(theCommand == "getControlPermission")
-         {
+                    }
+                }
+            }
+            else if(theCommand == "getControlPermission")
+            {
 
- #if fountainServerDebug
-             qDebug() << "getControlPermission Request";
+    #if fountainServerDebug
+                qDebug() << "getControlPermission Request";
 
- #endif
-             foreach (clientTcpSocket theClient, clientList) {
+    #endif
+                foreach (clientTcpSocket theClient, clientList) {
 
-                 if(theClient.getClientId() == requestJsonObject["ClientId"].toString())
-                 {
+                    if(theClient.getClientId() == requestJsonObject["ClientId"].toString())
+                    {
 
-                     theClient.setIsControlling(true);
-                     sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
-                 }
-                 else
-                 {
-                     theClient.setIsControlling(false);
-                 }
-             }
-         }
-     }
+                        theClient.setIsControlling(true);
+                        sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+                    }
+                    else
+                    {
+                        theClient.setIsControlling(false);
+                    }
+                }
+            }
+        }
 
-     if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();
-    }
-
+        if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();
 
 
 
