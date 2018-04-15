@@ -66,8 +66,8 @@ void fountainServer::newConnectionHandler()
     //    tcpSocketList.append(static_cast<clientTcpSocket*);
 
     //     tcpSocket = tcpServer->nextPendingConnection();
-    in.setDevice(newClient);
-    in.setVersion(QDataStream::Qt_5_8);
+//    in.setDevice(newClient);
+//    in.setVersion(QDataStream::Qt_5_8);
 
 
     connect(newClient, SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
@@ -87,8 +87,10 @@ void fountainServer::clientDisconnectedHandler(){
 void fountainServer::readyReadHandler()
 {
 
+    QTcpSocket* theClient = dynamic_cast<QTcpSocket *>(sender());
 
-
+    in.setDevice(theClient);
+    in.setVersion(QDataStream::Qt_5_8);
 
     in.startTransaction();
 
@@ -180,20 +182,19 @@ void fountainServer::readyReadHandler()
 #endif
             foreach (clientTcpSocket theClient, clientList) {
 
-                if(theClient.getClientId() != requestJsonObject["ClientId"].toString())
+                if(theClient.getClientId() == requestJsonObject["ClientId"].toString())
                 {
-                    theClient.setIsControlling(false);
+
+                    theClient.setIsControlling(true);
+                    sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
                 }
                 else
                 {
-                    theClient.setIsControlling(true);
-                    sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+                    theClient.setIsControlling(false);
                 }
             }
         }
     }
-
-
 
     if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();
 
