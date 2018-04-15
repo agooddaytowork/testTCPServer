@@ -66,8 +66,8 @@ void fountainServer::newConnectionHandler()
     //    tcpSocketList.append(static_cast<clientTcpSocket*);
 
     //     tcpSocket = tcpServer->nextPendingConnection();
-//    in.setDevice(newClient);
-//    in.setVersion(QDataStream::Qt_5_8);
+    //    in.setDevice(newClient);
+    //    in.setVersion(QDataStream::Qt_5_8);
 
 
     connect(newClient, SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
@@ -87,7 +87,8 @@ void fountainServer::clientDisconnectedHandler(){
 void fountainServer::readyReadHandler()
 {
 
-    QTcpSocket* theClient = dynamic_cast<QTcpSocket *>(sender());
+    QDataStream in;
+    QTcpSocket* theClient = static_cast<QTcpSocket *>(sender());
 
     in.setDevice(theClient);
     in.setVersion(QDataStream::Qt_5_8);

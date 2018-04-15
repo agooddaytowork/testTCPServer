@@ -22,7 +22,7 @@ class fountainServer: public QObject
     QTcpServer *tcpServer = nullptr;
     QTcpSocket *tcpSocket = nullptr;
     int m_Serverport;
-    QDataStream in;
+//    QDataStream in;
 
     QList<QTcpSocket*> tcpSocketList;
     QList<clientTcpSocket> clientList;
