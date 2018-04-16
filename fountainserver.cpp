@@ -130,6 +130,10 @@ void fountainServer::readyReadHandler()
 #endif
 
         }
+        else if(theCommand == "playSpeed")
+        {
+            emit toSerial(QByteArray::fromHex(requestJsonObject["Speed"].toString().toUtf8()));
+        }
         else if (theCommand == "isFountainOnline") {
 #if fountainServerDebug
             qDebug() << "isFountainOnline Request";
@@ -205,8 +209,6 @@ void fountainServer::readyReadHandler()
     }
 
     if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();
-
-
 
 }
 

@@ -13,12 +13,15 @@ QSerialPort mSerialPort;
 
     QByteArray mPortName;
     quint16 mBaudrate;
+    bool mIsWriting;
+    QList<QByteArray> toWriteList;
 
 signals:
     void connected();
     void disconnected();
     void errorsOcurred();
     void output(const QByteArray &data);
+    void writeToDeviceRequest(const QList<QByteArray> &buffer);
 
 public:
     explicit SimpleSerialInterface(QObject * parent = nullptr);
@@ -30,6 +33,7 @@ public slots:
     Q_INVOKABLE bool connect();
     Q_INVOKABLE bool disconnect();
      void input(const QByteArray &input);
+     void writeToDevice(const QList<QByteArray> &buffer);
 
 private slots:
     void receivedDataHandler();

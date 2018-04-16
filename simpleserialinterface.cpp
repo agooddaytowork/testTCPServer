@@ -1,12 +1,13 @@
 #include "simpleserialinterface.h"
 #include <QDebug>
-
+#include <QElapsedTimer>
 SimpleSerialInterface::SimpleSerialInterface(QObject *parent): mSerialPort(parent), mPortName("COM1"), mBaudrate(9600),QObject(parent)
 {
     Data.clear();
 
     QObject::connect(&mSerialPort,SIGNAL(readyRead()),this,SLOT(receivedDataHandler()));
     QObject::connect(&mSerialPort,SIGNAL(error(QSerialPort::SerialPortError)),this,SLOT(serialPortErrorHandler(QSerialPort::SerialPortError)));
+    QObject::connect(this,SIGNAL(writeToDeviceRequest(QList<QByteArray>)),this,SLOT(writeToDevice(QList<QByteArray>)));
 
 }
 
@@ -72,11 +73,47 @@ void SimpleSerialInterface::input(const QByteArray &input)
 {
     //    qDebug() << input;
 
-    if(mSerialPort.isOpen())
+    // add Data to Buffer
+
+
+    static QList<QByteArray> buffer;
+
+    if(!mIsWriting)
     {
-        qDebug() << "writing to Serial";
-        mSerialPort.write(input);
+        buffer.append(input);
+
+        emit writeToDeviceRequest(buffer);
+
+        buffer.clear();
     }
+    else
+    {
+        buffer.append(input);
+    }
+//    if(mSerialPort.isOpen())
+//    {
+//        qDebug() << "writing to Serial";
+//        mSerialPort.write(input);
+//    }
+
+}
+
+void SimpleSerialInterface::writeToDevice(const QList<QByteArray> &buffer)
+{
+    mIsWriting = true;
+    QElapsedTimer timeOutTimer;
+     timeOutTimer.start();
+    for(int i = 0; i < buffer.count(); i++)
+    {
+                qDebug() << "writing to Serial";
+                mSerialPort.write(buffer.at(i));
+                timeOutTimer.restart();
+                while (timeOutTimer.elapsed() < 100) {
+
+                }
+
+    }
+    mIsWriting = false;
 
 }
 
