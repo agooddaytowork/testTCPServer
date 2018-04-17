@@ -1,7 +1,7 @@
 #include "simpleserialinterface.h"
 #include <QDebug>
 #include <QElapsedTimer>
-SimpleSerialInterface::SimpleSerialInterface(QObject *parent): mSerialPort(parent), mPortName("COM1"), mBaudrate(9600),QObject(parent)
+SimpleSerialInterface::SimpleSerialInterface(QObject *parent): mSerialPort(parent), mPortName("COM1"), mBaudrate(9600), mIsWriting(false),QObject(parent)
 {
     Data.clear();
 

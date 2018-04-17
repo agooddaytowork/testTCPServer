@@ -141,6 +141,11 @@ void fountainServer::readyReadHandler()
 #endif
             informClientFountainStatus();
         }
+
+        else if(theCommand == "Disconnecting")
+        {
+            sendTcpPackageToClients(requestFromClient);
+        }
         else if(theCommand =="addNewClient")
         {
 #if fountainServerDebug
