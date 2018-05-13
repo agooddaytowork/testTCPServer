@@ -144,6 +144,10 @@ void fountainServer::readyReadHandler()
 
         else if(theCommand == "Disconnecting")
         {
+#if fountainServerDebug
+            qDebug() << "Disconnecting Request";
+
+#endif
             sendTcpPackageToClients(requestFromClient);
         }
         else if(theCommand =="addNewClient")

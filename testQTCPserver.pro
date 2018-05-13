@@ -1,5 +1,4 @@
-QT -= gui
-QT += network serialport
+QT += network serialport gui
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -19,10 +18,12 @@ SOURCES += main.cpp \
     fountainserver.cpp \
     simpleserialinterface.cpp \
     tcppackager.cpp \
-    clienttcpsocket.cpp
+    clienttcpsocket.cpp \
+    communicationchecker.cpp
 
 HEADERS += \
     fountainserver.h \
     simpleserialinterface.h \
     tcppackager.h \
-    clienttcpsocket.h
+    clienttcpsocket.h \
+    communicationchecker.h

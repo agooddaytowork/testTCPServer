@@ -32,10 +32,10 @@ int main(int argc, char *argv[])
 
     foreach (QSerialPortInfo port, QSerialPortInfo::availablePorts()) {
         qDebug() << port.portName();
-        if(port.portName() == "ttyS0")
+        if(port.portName() == "ttyUSB0")
         {
-            asimpleSerialInterface.setBaudRate(9600);
-            asimpleSerialInterface.setPortName("ttyS0");
+            asimpleSerialInterface.setBaudRate(19200);
+            asimpleSerialInterface.setPortName("ttyUSB0");
 
             if(asimpleSerialInterface.connect())
             {
