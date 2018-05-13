@@ -9,6 +9,7 @@
 
 communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this))
 {
+    QObject::connect(this,SIGNAL(stateChanged(int)),this,SLOT(stateChangedHandler(int)));
     QObject::connect(this, SIGNAL(stateChanged(const int &state)),this, SLOT(stateChangedHandler(const int &state)));
     m_timeOutTimer->setSingleShot(true);
 
@@ -164,8 +165,11 @@ void communicationChecker::stateChangedHandler(const int &state)
     }
 }
 
-void communicationChecker::in(QHash<int, QVariant>)
+void communicationChecker::in(const QHash<int, QVariant> &data)
 {
+
+    m_wifiID = data.value(0).toString();
+    m_wifiPassword = data.value(1).toString();
 
     emit stateChanged(3);
 }
@@ -177,6 +181,8 @@ bool communicationChecker::isIPValid( const QString &IP)
     QRegExp param("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})");
 
     QString data = IP;
+
+    data.remove(data.count()-1,1);
     int pos =0;
 
     QRegExpValidator checker(param, 0);

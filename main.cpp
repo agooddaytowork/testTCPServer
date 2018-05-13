@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     communicationChecker aCommuChecker;
 
-    aCommuChecker.S1CheckWifi();
+    aCommuChecker.start();
 
     QObject::connect(&aServer,&fountainServer::toSerial,&asimpleSerialInterface,&SimpleSerialInterface::input);
     QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::connected,[=](){

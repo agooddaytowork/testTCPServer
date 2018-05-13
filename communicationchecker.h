@@ -30,7 +30,7 @@ private slots:
     void stateChangedHandler(const int &state);
 
 public slots:
-    void in(QHash<int,QVariant>);
+    void in(const QHash<QString, QVariant> &data);
 public:
     communicationChecker(QObject *parent = nullptr);
     void start();
