@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include "fountainserver.h"
 #include "simpleserialinterface.h"
+#include "communicationchecker.h"
 #include <QSerialPortInfo>
 #include <QDebug>
 
@@ -11,6 +12,9 @@ int main(int argc, char *argv[])
     fountainServer aServer;
     SimpleSerialInterface asimpleSerialInterface;
 
+    communicationChecker aCommuChecker;
+
+    aCommuChecker.S1CheckWifi();
 
     QObject::connect(&aServer,&fountainServer::toSerial,&asimpleSerialInterface,&SimpleSerialInterface::input);
     QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::connected,[=](){

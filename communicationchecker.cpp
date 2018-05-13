@@ -11,6 +11,11 @@ communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_
 {
     QObject::connect(this, SIGNAL(stateChanged(const int &state)),this, SLOT(stateChangedHandler(const int &state)));
     m_timeOutTimer->setSingleShot(true);
+
+}
+
+void communicationChecker::start()
+{
     // start state machine
     emit stateChanged(1);
 }
@@ -30,24 +35,29 @@ void communicationChecker::S1CheckWifi()
 
     if(output == "" || output.isEmpty())
     {
+#if communicationCheckerDebug
+    qDebug() << "go to sate 2";
+#endif
         emit stateChanged(2); // request Wifi Info from fountain
     }
     else
     {
         if(isIPValid(output))
         {
-
+#if communicationCheckerDebug
+    qDebug() << "go to sate 5";
+#endif
             m_timeoutCounter = 0;
             emit stateChanged(5); // Wifi OK, go to idle state
         }
         else
         {
-
+#if communicationCheckerDebug
+    qDebug() << "go to sate 2";
+#endif
             emit stateChanged(2); // request Wifi Info from fountain
         }
     }
-
-
 
 }
 

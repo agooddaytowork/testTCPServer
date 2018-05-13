@@ -33,6 +33,7 @@ public slots:
     void in(QHash<int,QVariant>);
 public:
     communicationChecker(QObject *parent = nullptr);
+    void start();
 
 signals:
 
