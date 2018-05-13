@@ -10,7 +10,6 @@
 communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this))
 {
     QObject::connect(this,SIGNAL(stateChanged(int)),this,SLOT(stateChangedHandler(int)));
-    QObject::connect(this, SIGNAL(stateChanged(const int &state)),this, SLOT(stateChangedHandler(const int &state)));
     m_timeOutTimer->setSingleShot(true);
 
 }
@@ -86,6 +85,9 @@ void communicationChecker::S2RequestWifiInfo()
 
 void communicationChecker::S3ConnectWifi()
 {
+
+
+
     QProcess process;
     process.start((QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword);
     process.waitForFinished();
