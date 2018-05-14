@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QRegExpValidator>
 #include <QValidator>
+#include "fountainserialpackager.h"
 
 class communicationChecker: public QObject
 {
@@ -30,7 +31,7 @@ private slots:
     void stateChangedHandler(const int &state);
 
 public slots:
-    void in(const QHash<int, QVariant> &data);
+    void in(const QByteArray &data);
 public:
     communicationChecker(QObject *parent = nullptr);
     void start();
@@ -38,9 +39,9 @@ public:
 signals:
 
     void stateChanged(const int &state);
-    void requestWifiInfo();
-    void requestUserInputForWifiInfo();
-    void wifiOK();
+    void requestWifiInfo( const QByteArray &data);
+    void requestUserInputForWifiInfo(const QByteArray &data);
+    void wifiOK(const QByteArray &data);
 
 
 };

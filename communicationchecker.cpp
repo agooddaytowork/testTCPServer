@@ -63,7 +63,7 @@ void communicationChecker::S1CheckWifi()
 
 void communicationChecker::S2RequestWifiInfo()
 {
-    emit requestWifiInfo();
+    emit requestWifiInfo(fountainSerialPackager::fountainDeviceRequestWifi());
 
     m_timeOutTimer->stop();
 
@@ -101,7 +101,7 @@ void communicationChecker::S4RequestUserInputForWifi()
 {
 
     m_timeoutCounter = 0;
-    emit requestUserInputForWifiInfo();
+    emit requestUserInputForWifiInfo(fountainSerialPackager::fountainDeviceRequestUserInputForWifi());
 
     m_timeOutTimer->stop();
 
@@ -119,7 +119,7 @@ void communicationChecker::S4RequestUserInputForWifi()
 
 void communicationChecker::S5Idle()
 {
-    emit wifiOK();
+    emit wifiOK(fountainSerialPackager::fountainDeviceWifiOK());
 
     m_timeOutTimer->stop();
 
@@ -167,13 +167,22 @@ void communicationChecker::stateChangedHandler(const int &state)
     }
 }
 
-void communicationChecker::in(const QHash<int, QVariant> &data)
+void communicationChecker::in(const QByteArray &data)
 {
 
-    m_wifiID = data.value(0).toString();
-    m_wifiPassword = data.value(1).toString();
+    fountainSerialPackager aPackage(data);
 
-    emit stateChanged(3);
+    if(aPackage.isPackageValid())
+    {
+        m_wifiID = aPackage.getWifiName();
+        m_wifiPassword = aPackage.getWifiPassword();
+        emit stateChanged(3);
+    }
+    else
+    {
+        emit stateChanged(2);
+    }
+
 }
 
 

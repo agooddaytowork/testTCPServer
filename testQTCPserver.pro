@@ -19,11 +19,13 @@ SOURCES += main.cpp \
     simpleserialinterface.cpp \
     tcppackager.cpp \
     clienttcpsocket.cpp \
-    communicationchecker.cpp
+    communicationchecker.cpp \
+    fountainserialpackager.cpp
 
 HEADERS += \
     fountainserver.h \
     simpleserialinterface.h \
     tcppackager.h \
     clienttcpsocket.h \
-    communicationchecker.h
+    communicationchecker.h \
+    fountainserialpackager.h
