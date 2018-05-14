@@ -35,26 +35,17 @@ void communicationChecker::S1CheckWifi()
 
     if(output == "" || output.isEmpty())
     {
-#if communicationCheckerDebug
-    qDebug() << "go to sate 2";
-#endif
         emit stateChanged(2); // request Wifi Info from fountain
     }
     else
     {
         if(isIPValid(output))
         {
-#if communicationCheckerDebug
-    qDebug() << "go to sate 5";
-#endif
             m_timeoutCounter = 0;
             emit stateChanged(5); // Wifi OK, go to idle state
         }
         else
         {
-#if communicationCheckerDebug
-    qDebug() << "go to sate 2";
-#endif
             emit stateChanged(2); // request Wifi Info from fountain
         }
     }
@@ -93,7 +84,6 @@ void communicationChecker::S3ConnectWifi()
     process.waitForFinished();
 
     emit stateChanged(1); // check wifi again
-
 
 }
 
@@ -139,6 +129,9 @@ void communicationChecker::stateChangedHandler(const int &state)
 {
     m_currentState = state;
 
+#if communicationCheckerDebug
+    qDebug() << "current State: " + m_currentState;
+#endif
     switch (m_currentState) {
     case 1:
         S1CheckWifi();
@@ -182,6 +175,10 @@ void communicationChecker::in(const QByteArray &data)
         {
             m_wifiID = aPackage.getWifiName();
             m_wifiPassword = aPackage.getWifiPassword();
+#if communicationCheckerDebug
+    qDebug() << "wifi Name:" + m_wifiID;
+    qDebug() << "wifi Password" + m_wifiPassword;
+#endif
             emit stateChanged(3);
         }
         // goi Tin Bat tay

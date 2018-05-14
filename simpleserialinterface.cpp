@@ -134,6 +134,7 @@ void SimpleSerialInterface::receivedDataHandler()
     {
         emit output(data);
         data.clear();
+        input(data);
     }
 
 }
