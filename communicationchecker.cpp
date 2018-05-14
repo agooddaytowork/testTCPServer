@@ -78,12 +78,29 @@ void communicationChecker::S3ConnectWifi()
 {
 
 
-
-    QProcess process;
-
+    QStringList argo,list;
     qDebug() << (QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword;
-    process.start((QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword);
-    process.waitForFinished();
+
+        QProcess * exec;
+        exec =new QProcess(this);
+
+        argo <<(QString)folderPath + "connectwifi.sh " ;
+        argo<< m_wifiID;
+        argo<< m_wifiPassword;
+
+        list <<"PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:";
+
+        exec->setEnvironment(list);
+        exec->setProcessChannelMode(QProcess::ForwardedChannels );
+        exec->start("/usr/sbin/sh", argo);
+        exec->waitForFinished();
+
+
+//    QProcess process;
+
+//    qDebug() << (QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword;
+//    process.start((QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword);
+//    process.waitForFinished();
 
     emit stateChanged(1); // check wifi again
 
