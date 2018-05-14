@@ -42,6 +42,7 @@ signals:
     void requestWifiInfo( const QByteArray &data);
     void requestUserInputForWifiInfo(const QByteArray &data);
     void wifiOK(const QByteArray &data);
+    void wifiNotOK(const QByteArray &data);
 
 
 };

@@ -174,9 +174,35 @@ void communicationChecker::in(const QByteArray &data)
 
     if(aPackage.isPackageValid())
     {
-        m_wifiID = aPackage.getWifiName();
-        m_wifiPassword = aPackage.getWifiPassword();
-        emit stateChanged(3);
+
+        quint8 statusCode = aPackage.getStatusCode();
+
+        // lay thong tin WIFI
+        if(statusCode == 0x04 || statusCode == 0x08)
+        {
+            m_wifiID = aPackage.getWifiName();
+            m_wifiPassword = aPackage.getWifiPassword();
+            emit stateChanged(3);
+        }
+        // goi Tin Bat tay
+        else if(statusCode == 0x01)
+        {
+            if(m_currentState == 5)
+            {
+                // Wifi OK - status code 0x03
+                emit wifiOK(fountainSerialPackager::fountainDeviceWifiOK());
+            }
+            else
+            {
+                // Wifi khong OK - status code 0x00
+                emit wifiNotOK(fountainSerialPackager::fountainDeviceWifiNotOK());
+            }
+        }
+        else
+        {
+            // gui tra lai y chang neu khong dung voi cac statusCOde tren
+            emit wifiOK(data);
+        }
     }
     else
     {

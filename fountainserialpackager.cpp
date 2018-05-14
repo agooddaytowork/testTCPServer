@@ -226,6 +226,13 @@ QByteArray fountainSerialPackager::fountainDeviceRequestUserInputForWifi()
     return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID(0x00).setData(m_Status_RequestUserInputForWifi).setPackageLength().generateSerialPackage();
 }
 
+QByteArray fountainSerialPackager::fountainDeviceWifiNotOK()
+{
+    fountainSerialPackager aPackage;
+
+    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID(0x00).setData(0x00).setPackageLength().generateSerialPackage();
+}
+
 QByteArray fountainSerialPackager::fountainDeviceRequestWifi()
 {
     fountainSerialPackager aPackage;
@@ -298,6 +305,11 @@ return m_WifiName;
 QString fountainSerialPackager::getWifiPassword()
 {
 return m_WifiPassword;
+}
+
+quint8 fountainSerialPackager::getStatusCode()
+{
+ return m_StatusCode;
 }
 
 

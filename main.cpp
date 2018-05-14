@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
     QObject::connect(&aCommuChecker,&communicationChecker::requestUserInputForWifiInfo,&asimpleSerialInterface,&SimpleSerialInterface::input);
     QObject::connect(&aCommuChecker,&communicationChecker::requestWifiInfo,&asimpleSerialInterface,&SimpleSerialInterface::input);
     QObject::connect(&aCommuChecker,&communicationChecker::wifiOK,&asimpleSerialInterface,&SimpleSerialInterface::input);
+    QObject::connect(&aCommuChecker,&communicationChecker::wifiNotOK,&asimpleSerialInterface,&SimpleSerialInterface::input);
     aCommuChecker.start();
 
 
