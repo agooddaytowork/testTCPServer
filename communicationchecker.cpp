@@ -7,6 +7,8 @@
 #define requestTimeOutMaxCounter 3
 #define idleTimeOutInterval 120000 // 2 phut
 
+#include <QEventLoop>
+
 communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this))
 {
     QObject::connect(this,SIGNAL(stateChanged(int)),this,SLOT(stateChangedHandler(int)));
@@ -71,38 +73,19 @@ void communicationChecker::S3ConnectWifi()
 {
 
 
-    QStringList argo,list;
-    qDebug() << (QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword;
+        QEventLoop loop;
+       QProcess *proc = new QProcess();
+       connect(proc, SIGNAL(finished(int)), &loop, SLOT(quit()));
+       proc->setEnvironment(QStringList() << "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:");
+       proc->start("/bin/bash", QStringList() << (QString)folderPath + "connectwifi.sh" << m_wifiID << m_wifiPassword);
+       loop.exec();
 
-        QProcess * exec;
-        exec =new QProcess(this);
-
-        argo <<(QString)folderPath + "connectwifi.sh " ;
-        argo<< m_wifiID;
-        argo<< m_wifiPassword;
-
-        list <<"PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:";
-
-        exec->setEnvironment(list);
-        exec->setProcessChannelMode(QProcess::ForwardedChannels );
-        exec->start("/usr/sbin/sh", argo);
-        exec->waitForFinished();
-
-        QString output = exec->readAllStandardOutput();
-
-    #if communicationCheckerDebug
-        qDebug() << output;
-        QString err = exec->readAllStandardError();
-        qDebug() << err;
-    #endif
-
-
-//    QProcess process;
-
-//    qDebug() << (QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword;
-//    process.start((QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword);
-//    process.waitForFinished();
-
+#if communicationCheckerDebug
+    QString output = proc->readAllStandardOutput();
+    qDebug() << output;
+    QString err = proc->readAllStandardError();
+    qDebug() << err;
+#endif
     emit stateChanged(1); // check wifi again
 
 }
@@ -120,7 +103,7 @@ void communicationChecker::S4RequestUserInputForWifi()
 
 void communicationChecker::S5Idle()
 {
-     m_timeoutCounter = 0;
+    m_timeoutCounter = 0;
     emit wifiOK(fountainSerialPackager::fountainDeviceWifiOK());
 
     m_timeOutTimer->stop();
@@ -179,8 +162,8 @@ void communicationChecker::in(const QByteArray &data)
             m_wifiID = aPackage.getWifiName();
             m_wifiPassword = aPackage.getWifiPassword();
 #if communicationCheckerDebug
-    qDebug() << "wifi Name: " + m_wifiID;
-    qDebug() << "wifi Password " + m_wifiPassword;
+            qDebug() << "wifi Name: " + m_wifiID;
+            qDebug() << "wifi Password " + m_wifiPassword;
 #endif
             emit stateChanged(3);
         }
