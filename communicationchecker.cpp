@@ -80,6 +80,8 @@ void communicationChecker::S3ConnectWifi()
 
 
     QProcess process;
+
+    qDebug() << (QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword;
     process.start((QString)folderPath + "connectwifi.sh " + m_wifiID +" " + m_wifiPassword);
     process.waitForFinished();
 
@@ -130,7 +132,7 @@ void communicationChecker::stateChangedHandler(const int &state)
     m_currentState = state;
 
 #if communicationCheckerDebug
-    qDebug() << "current State: " + m_currentState;
+    qDebug() << "current State: " + QString::number(m_currentState);
 #endif
     switch (m_currentState) {
     case 1:
@@ -176,8 +178,8 @@ void communicationChecker::in(const QByteArray &data)
             m_wifiID = aPackage.getWifiName();
             m_wifiPassword = aPackage.getWifiPassword();
 #if communicationCheckerDebug
-    qDebug() << "wifi Name:" + m_wifiID;
-    qDebug() << "wifi Password" + m_wifiPassword;
+    qDebug() << "wifi Name: " + m_wifiID;
+    qDebug() << "wifi Password " + m_wifiPassword;
 #endif
             emit stateChanged(3);
         }
