@@ -29,9 +29,11 @@ class communicationChecker: public QObject
 private slots:
 
     void stateChangedHandler(const int &state);
+    void timerTimeoutHandler();
 
 public slots:
     void in(const QByteArray &data);
+
 public:
     communicationChecker(QObject *parent = nullptr);
     void start();

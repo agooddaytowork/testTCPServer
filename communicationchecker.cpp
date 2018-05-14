@@ -12,6 +12,8 @@ communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_
     QObject::connect(this,SIGNAL(stateChanged(int)),this,SLOT(stateChangedHandler(int)));
     m_timeOutTimer->setSingleShot(true);
 
+    QObject::connect(m_timeOutTimer, &QTimer::timeout, this,&communicationChecker::timerTimeoutHandler);
+
 }
 
 void communicationChecker::start()
@@ -57,16 +59,7 @@ void communicationChecker::S2RequestWifiInfo()
     emit requestWifiInfo(fountainSerialPackager::fountainDeviceRequestWifi());
 
     m_timeOutTimer->stop();
-
     m_timeOutTimer->setInterval(requestTimeOutInterval);
-    QObject::connect(m_timeOutTimer,&QTimer::timeout,[=](){
-
-        if(m_currentState == 2)
-        {
-            m_timeoutCounter++;
-            emit stateChanged(2);
-        }
-    });
     m_timeOutTimer->start();
 
 
@@ -95,6 +88,14 @@ void communicationChecker::S3ConnectWifi()
         exec->start("/usr/sbin/sh", argo);
         exec->waitForFinished();
 
+        QString output = exec->readAllStandardOutput();
+
+    #if communicationCheckerDebug
+        qDebug() << output;
+        QString err = exec->readAllStandardError();
+        qDebug() << err;
+    #endif
+
 
 //    QProcess process;
 
@@ -113,34 +114,17 @@ void communicationChecker::S4RequestUserInputForWifi()
     emit requestUserInputForWifiInfo(fountainSerialPackager::fountainDeviceRequestUserInputForWifi());
 
     m_timeOutTimer->stop();
-
     m_timeOutTimer->setInterval(requestTimeOutInterval);
-    QObject::connect(m_timeOutTimer,&QTimer::timeout,[=](){
-
-        if(m_currentState == 4)
-        {
-            m_timeoutCounter++;
-            emit stateChanged(4);
-        }
-    });
     m_timeOutTimer->start();
 }
 
 void communicationChecker::S5Idle()
 {
+     m_timeoutCounter = 0;
     emit wifiOK(fountainSerialPackager::fountainDeviceWifiOK());
 
     m_timeOutTimer->stop();
-
     m_timeOutTimer->setInterval(idleTimeOutInterval);
-    QObject::connect(m_timeOutTimer,&QTimer::timeout,[=](){
-
-        if(m_currentState == 5)
-        {
-            m_timeoutCounter++;
-            emit stateChanged(1);
-        }
-    });
     m_timeOutTimer->start();
 }
 
@@ -246,4 +230,23 @@ bool communicationChecker::isIPValid( const QString &IP)
     }
 
     return false;
+}
+
+void communicationChecker::timerTimeoutHandler()
+{
+    if(m_currentState == 2)
+    {
+        m_timeoutCounter++;
+        emit stateChanged(2);
+    }
+    else if(m_currentState == 4)
+    {
+        m_timeoutCounter++;
+        emit stateChanged(4);
+    }
+    else if(m_currentState == 5)
+    {
+        m_timeoutCounter++;
+        emit stateChanged(1);
+    }
 }
