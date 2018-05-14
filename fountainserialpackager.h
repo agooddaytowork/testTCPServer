@@ -17,9 +17,9 @@
 #define  m_OpCode_FountainDeviceInternalHandShake                   0x00
 #define  m_Status_FountainDeviceHandShake                           0x01
 #define  m_Status_WifiOK                                            0x03
-#define  m_Status_VPNOK                                             0x04
-#define  m_Status_RequestWifi                                       0x08
-#define  m_Status_RequestUserInputForWifi                           0x16
+//#define  m_Status_VPNOK                                             0x04
+#define  m_Status_RequestWifi                                       0x04
+#define  m_Status_RequestUserInputForWifi                           0x08
 
 class fountainSerialPackager : public QObject
 {

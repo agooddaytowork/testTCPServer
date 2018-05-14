@@ -1,4 +1,5 @@
 #include "fountainserialpackager.h"
+#include <QDebug>
 
  fountainSerialPackager::fountainSerialPackager(QObject * parent): QObject(parent), m_OperationCode(0x00), m_PackageLength(0x00), m_BoxID(0x00), m_FOID(0x00), m_ProgramID(0x00),m_Repeat(0x00), m_StatusCode(0x00) ,m_IsPackageValid(true)
 {
@@ -271,6 +272,12 @@ void fountainSerialPackager::decodePackage(const QByteArray &data)
                 break;
             case 3:
                 m_PackageLength = m_PackageLength | data[i];
+
+                if(m_PackageLength != (data.count() -1))
+                {
+                    return;
+                }
+
                 break;
             case 4:
                 m_BoxID = data[i];
@@ -280,7 +287,7 @@ void fountainSerialPackager::decodePackage(const QByteArray &data)
                 break;
             default:
 
-                if(i != data.count() -1)
+                if(i != (data.count() -1))
                 {
                 m_Data.append(data[i]);
                 }
@@ -288,6 +295,8 @@ void fountainSerialPackager::decodePackage(const QByteArray &data)
             }
         }
 
+        qDebug() << "package is valid";
+        qDebug() << "Data: " + m_Data;
         m_IsPackageValid = true;
 
     }

@@ -1,10 +1,13 @@
 #include "simpleserialinterface.h"
 #include <QDebug>
 #include <QElapsedTimer>
+#include "fountainserialpackager.h"
+
 SimpleSerialInterface::SimpleSerialInterface(QObject *parent): mSerialPort(parent), mPortName("COM1"), mBaudrate(9600), mIsWriting(false),QObject(parent)
 {
     Data.clear();
 
+//    dataStreamInput.setDevice(mSerialPort);
     QObject::connect(&mSerialPort,SIGNAL(readyRead()),this,SLOT(receivedDataHandler()));
     QObject::connect(&mSerialPort,SIGNAL(error(QSerialPort::SerialPortError)),this,SLOT(serialPortErrorHandler(QSerialPort::SerialPortError)));
     QObject::connect(this,SIGNAL(writeToDeviceRequest(QList<QByteArray>)),this,SLOT(writeToDevice(QList<QByteArray>)));
@@ -124,11 +127,15 @@ void SimpleSerialInterface::receivedDataHandler()
 
     tmpdata = mSerialPort.readAll();
     data +=tmpdata;
-    if(tmpdata.at(tmpdata.count()-1)=='\r')
+
+    fountainSerialPackager aPackage(data);
+
+    if(aPackage.isPackageValid())
     {
         emit output(data);
         data.clear();
     }
+
 }
 
 

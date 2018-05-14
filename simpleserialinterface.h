@@ -4,6 +4,7 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QMap>
+#include <QDataStream>
 
 class SimpleSerialInterface: public QObject
 {
@@ -15,6 +16,7 @@ QSerialPort mSerialPort;
     quint16 mBaudrate;
     bool mIsWriting;
     QList<QByteArray> toWriteList;
+    QDataStream dataStreamInput;
 
 signals:
     void connected();
