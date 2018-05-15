@@ -34,7 +34,7 @@ class fountainServer: public QObject
 
 
 public:
-    fountainServer(QObject *parent = nullptr);
+    fountainServer( QObject *parent = nullptr);
     void setIsFountainOnline(const bool &input);
     void informClientFountainStatus();
     void informClientCurrentPlayingProgram();

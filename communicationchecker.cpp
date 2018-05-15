@@ -71,9 +71,7 @@ void communicationChecker::S2RequestWifiInfo()
 
 void communicationChecker::S3ConnectWifi()
 {
-
-
-        QEventLoop loop;
+       QEventLoop loop;
        QProcess *proc = new QProcess();
        connect(proc, SIGNAL(finished(int)), &loop, SLOT(quit()));
        proc->setEnvironment(QStringList() << "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:");

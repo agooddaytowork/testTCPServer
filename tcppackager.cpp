@@ -1,9 +1,12 @@
 #include "tcppackager.h"
+#include <QDebug>
 
 tcpPackager::tcpPackager()
 {
 
 }
+
+int tcpPackager::m_FountainID = 0;
 
 QString tcpPackager::m_clientId = tcpPackager::generateClientId();
 QString tcpPackager::generateClientId()
@@ -159,4 +162,11 @@ QByteArray tcpPackager::AskWhoIsControlling()
 
     QJsonDocument aDocument(thePackage);
     return aDocument.toJson();
+}
+
+void tcpPackager::setFountainID(const int &id)
+{
+    m_FountainID = id;
+
+    qDebug() << "Fountain ID: " + QString::number(m_FountainID);
 }

@@ -12,6 +12,7 @@ class tcpPackager
 
 
 public:
+    static int m_FountainID;
     static QString m_clientId;
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN) || defined(Q_OS_UNIX)
     static constexpr int m_clientType = 0;
@@ -30,6 +31,7 @@ public:
     static QJsonObject packageToJson(const QByteArray &input);
     static QByteArray AnswerWhoIsControlling(const QString &clientId, const int &clientType);
     static QByteArray AskWhoIsControlling();
+    static void setFountainID(const int &id);
 
 
 
