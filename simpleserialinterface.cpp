@@ -105,16 +105,15 @@ void SimpleSerialInterface::writeToDevice(const QList<QByteArray> &buffer)
 {
     mIsWriting = true;
     QElapsedTimer timeOutTimer;
-     timeOutTimer.start();
+
     for(int i = 0; i < buffer.count(); i++)
     {
                 qDebug() << "writing to Serial";
                 mSerialPort.write(buffer.at(i));
-                timeOutTimer.restart();
-                while (timeOutTimer.elapsed() < 300) {
 
-                }
                 timeOutTimer.restart();
+                while (!timeOutTimer.hasExpired(200)) {
+                }
 
     }
     mIsWriting = false;

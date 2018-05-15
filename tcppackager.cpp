@@ -30,6 +30,7 @@ QByteArray tcpPackager::playProgram(const QString &programName, const QByteArray
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
     time.append(QString::number(theTimeStamp));
+    thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("ClientId", m_clientId);
     thePackage.insert("ClientType", m_clientType);
     thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
@@ -75,6 +76,7 @@ QByteArray tcpPackager::isFountainOnline()
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
     time.append(QString::number(theTimeStamp));
+    thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("ClientId", m_clientId);
     thePackage.insert("ClientType", m_clientType);
     thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
@@ -92,7 +94,7 @@ QByteArray tcpPackager::fountainResponse(const QByteArray &response)
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
     time.append(QString::number(theTimeStamp));
-
+    thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "fountainResponse");
@@ -108,6 +110,7 @@ QByteArray tcpPackager::fountainStatus(const bool &status)
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
     time.append(QString::number(theTimeStamp));
+    thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "fountainStatus");
@@ -124,6 +127,7 @@ QByteArray tcpPackager::fountainCurrentPlayingProgram(const QString &program)
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
     time.append(QString::number(theTimeStamp));
+    thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "fountainCurrentPlayingProgram");
@@ -139,6 +143,7 @@ QByteArray tcpPackager::AnswerWhoIsControlling(const QString &clientId, const in
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
     time.append(QString::number(theTimeStamp));
+    thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "whoIsControlling");
@@ -154,6 +159,7 @@ QByteArray tcpPackager::AskWhoIsControlling()
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
     time.append(QString::number(theTimeStamp));
+    thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("ClientId", m_clientId);
     thePackage.insert("ClientType", m_clientType);
     thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
@@ -170,3 +176,9 @@ void tcpPackager::setFountainID(const int &id)
 
     qDebug() << "Fountain ID: " + QString::number(m_FountainID);
 }
+
+int tcpPackager::getFountainID()
+{
+    return m_FountainID;
+}
+

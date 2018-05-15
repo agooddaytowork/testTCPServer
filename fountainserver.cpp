@@ -148,7 +148,11 @@ void fountainServer::readyReadHandler()
             qDebug() << "Disconnecting Request";
 
 #endif
-            sendTcpPackageToClients(requestFromClient);
+            if(tcpPackager::getFountainID() == 0)
+            {
+                sendTcpPackageToClients(requestFromClient);
+            }
+
         }
         else if(theCommand =="addNewClient")
         {
@@ -182,17 +186,22 @@ void fountainServer::readyReadHandler()
         }
         else if(theCommand == "whoIsControlling")
         {
+
+            if(tcpPackager::getFountainID() == 0)
+            {
 #if fountainServerDebug
-            qDebug() << "whoIsControlling Request";
+                qDebug() << "whoIsControlling Request";
 
 #endif
-            foreach (clientTcpSocket theClient, clientList) {
-                if(theClient.isControlling())
-                {
-                    sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+                foreach (clientTcpSocket theClient, clientList) {
+                    if(theClient.isControlling())
+                    {
+                        sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
 
+                    }
                 }
             }
+
         }
         else if(theCommand == "getControlPermission")
         {
@@ -207,7 +216,12 @@ void fountainServer::readyReadHandler()
                 {
 
                     theClient.setIsControlling(true);
-                    sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+
+                    if(tcpPackager::getFountainID() == 0)
+                    {
+                     sendTcpPackageToClients(tcpPackager::AnswerWhoIsControlling(theClient.getClientId(), theClient.getClientType()));
+                    }
+
                 }
                 else
                 {

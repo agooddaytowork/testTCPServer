@@ -32,6 +32,7 @@ public:
     static QByteArray AnswerWhoIsControlling(const QString &clientId, const int &clientType);
     static QByteArray AskWhoIsControlling();
     static void setFountainID(const int &id);
+    static int getFountainID();
 
 
 
