@@ -5,22 +5,22 @@
 
 #define requestTimeOutInterval 30000 // 30s
 #define requestTimeOutMaxCounter 3
-#define idleTimeOutInterval 120000 // 2 phut
-#define handShakeInterval 10000
+#define idleTimeOutInterval 10000 // 2 phut
+#define deviceTimeOutCounterThreshold 6
 
 #include <QEventLoop>
 
-communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this)), m_HandShakeTimer(new QTimer(this))
+communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this)), m_fountainTimeOutCounter(0)
 {
     QObject::connect(this,SIGNAL(stateChanged(int)),this,SLOT(stateChangedHandler(int)));
     m_timeOutTimer->setSingleShot(true);
 
     QObject::connect(m_timeOutTimer, &QTimer::timeout, this,&communicationChecker::timerTimeoutHandler);
 
-    m_HandShakeTimer->setSingleShot(false);
-    QObject::connect(m_HandShakeTimer,&QTimer::timeout,this,&communicationChecker::S6HandShake);
-    m_HandShakeTimer->setInterval(handShakeInterval);
-    m_HandShakeTimer->start();
+//    m_HandShakeTimer->setSingleShot(false);
+//    QObject::connect(m_HandShakeTimer,&QTimer::timeout,this,&communicationChecker::S6HandShake);
+//    m_HandShakeTimer->setInterval(handShakeInterval);
+//    m_HandShakeTimer->start();
 
 }
 
@@ -96,8 +96,8 @@ void communicationChecker::S4RequestUserInputForWifi()
 {
 
     m_timeoutCounter = 0;
-    emit requestUserInputForWifiInfo(fountainSerialPackager::fountainDeviceRequestUserInputForWifi());
-
+//    emit requestUserInputForWifiInfo(fountainSerialPackager::fountainDeviceRequestUserInputForWifi());
+emit requestWifiInfo(fountainSerialPackager::fountainDeviceRequestWifi());
     m_timeOutTimer->stop();
     m_timeOutTimer->setInterval(requestTimeOutInterval);
     m_timeOutTimer->start();
@@ -164,7 +164,7 @@ void communicationChecker::in(const QByteArray &data)
         quint8 statusCode = aPackage.getStatusCode();
 
         // lay thong tin WIFI
-        if(statusCode == 0x04 || statusCode == 0x08)
+        if(statusCode == m_Status_RequestWifi)
         {
             m_wifiID = aPackage.getWifiName();
             m_wifiPassword = aPackage.getWifiPassword();
@@ -175,18 +175,22 @@ void communicationChecker::in(const QByteArray &data)
             emit stateChanged(3);
         }
         // goi Tin Bat tay
-        else if(statusCode == 0x01)
+        else if(statusCode == m_Status_FountainDeviceHandShake)
         {
-            if(m_currentState == 5)
-            {
-                // Wifi OK - status code 0x03
-                emit wifiOK(fountainSerialPackager::fountainDeviceWifiOK());
-            }
-            else
-            {
-                // Wifi khong OK - status code 0x00
-                emit wifiNotOK(fountainSerialPackager::fountainDeviceWifiNotOK());
-            }
+//            if(m_currentState == 5)
+//            {
+//                // Wifi OK - status code 0x03
+//                emit wifiOK(fountainSerialPackager::fountainDeviceWifiOK());
+//            }
+//            else
+//            {
+//                // Wifi khong OK - status code 0x00
+//                emit wifiNotOK(fountainSerialPackager::fountainDeviceWifiNotOK());
+//            }
+
+        emit fountainStatus(true);
+        m_fountainTimeOutCounter = 0;
+
         }
         else
         {
@@ -224,6 +228,11 @@ bool communicationChecker::isIPValid( const QString &IP)
 
 void communicationChecker::timerTimeoutHandler()
 {
+    if(m_fountainTimeOutCounter >= deviceTimeOutCounterThreshold)
+    {
+        emit fountainStatus(false);
+    }
+
     if(m_currentState == 2)
     {
         m_timeoutCounter++;
@@ -239,4 +248,6 @@ void communicationChecker::timerTimeoutHandler()
         m_timeoutCounter++;
         emit stateChanged(1);
     }
+
+    m_fountainTimeOutCounter++;
 }

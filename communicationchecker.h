@@ -14,10 +14,11 @@ class communicationChecker: public QObject
     Q_OBJECT
     int m_currentState;
     int m_timeoutCounter;
+    int m_fountainTimeOutCounter;
     QString m_wifiID;
     QString m_wifiPassword;
     QTimer *m_timeOutTimer;
-    QTimer *m_HandShakeTimer;
+//    QTimer *m_HandShakeTimer;
 
     void S1CheckWifi();
     void S2RequestWifiInfo();
@@ -47,6 +48,8 @@ signals:
     void requestUserInputForWifiInfo(const QByteArray &data);
     void wifiOK(const QByteArray &data);
     void wifiNotOK(const QByteArray &data);
+
+    void fountainStatus(const bool &status);
 
 
     // for fountainServer
