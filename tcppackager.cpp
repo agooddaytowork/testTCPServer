@@ -14,9 +14,6 @@ QString tcpPackager::generateClientId()
 
     return (QString) QCryptographicHash::hash("clientId" + QByteArray::number(QDateTime::currentMSecsSinceEpoch()),QCryptographicHash::Sha256);
 
-
-
-
 }
 
 
@@ -25,6 +22,7 @@ QString tcpPackager::generateClientId()
 
 QByteArray tcpPackager::playProgram(const QString &programName, const QByteArray &Program)
 {
+    delayPerElectricalBox();
     QJsonObject thePackage;
 
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
@@ -46,6 +44,7 @@ QByteArray tcpPackager::playProgram(const QString &programName, const QByteArray
 
 bool tcpPackager::isPackageValid(const QByteArray &input)
 {
+    delayPerElectricalBox();
     QJsonObject thePackage = packageToJson(input);
 
     if(!thePackage.isEmpty())
@@ -71,6 +70,7 @@ QJsonObject tcpPackager::packageToJson(const QByteArray &input)
 
 QByteArray tcpPackager::isFountainOnline()
 {
+    delayPerElectricalBox();
     QJsonObject thePackage;
 
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
@@ -89,6 +89,7 @@ QByteArray tcpPackager::isFountainOnline()
 
 QByteArray tcpPackager::fountainResponse(const QByteArray &response)
 {
+    delayPerElectricalBox();
     QJsonObject thePackage;
 
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
@@ -105,6 +106,7 @@ QByteArray tcpPackager::fountainResponse(const QByteArray &response)
 
 QByteArray tcpPackager::fountainStatus(const bool &status)
 {
+    delayPerElectricalBox();
     QJsonObject thePackage;
 
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
@@ -122,6 +124,7 @@ QByteArray tcpPackager::fountainStatus(const bool &status)
 
 QByteArray tcpPackager::fountainCurrentPlayingProgram(const QString &program)
 {
+    delayPerElectricalBox();
     QJsonObject thePackage;
 
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
@@ -138,6 +141,7 @@ QByteArray tcpPackager::fountainCurrentPlayingProgram(const QString &program)
 
 QByteArray tcpPackager::AnswerWhoIsControlling(const QString &clientId, const int &clientType)
 {
+    delayPerElectricalBox();
     QJsonObject thePackage;
 
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
@@ -155,6 +159,7 @@ QByteArray tcpPackager::AnswerWhoIsControlling(const QString &clientId, const in
 
 QByteArray tcpPackager::AskWhoIsControlling()
 {
+    delayPerElectricalBox();
     QJsonObject thePackage;
     qint64 theTimeStamp = QDateTime::currentMSecsSinceEpoch();
     QByteArray time;
@@ -180,5 +185,14 @@ void tcpPackager::setFountainID(const int &id)
 int tcpPackager::getFountainID()
 {
     return m_FountainID;
+}
+
+void tcpPackager::delayPerElectricalBox()
+{
+    QElapsedTimer timer;
+        timer.start();
+
+        while (!timer.hasExpired((tcpPackager::getFountainID()+1) * 15));
+
 }
 

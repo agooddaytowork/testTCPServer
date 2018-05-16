@@ -50,7 +50,7 @@ signals:
     void wifiNotOK(const QByteArray &data);
 
     void fountainStatus(const bool &status);
-
+    void toFountainServer(const QByteArray &data);
 
     // for fountainServer
     void fountainOnline(const bool &status);

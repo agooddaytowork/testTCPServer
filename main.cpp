@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
     if(!daiphunSetting.contains("baudRate")) daiphunSetting.setValue("baudRate", 19200);
     if(!daiphunSetting.contains("daiphunID")) daiphunSetting.setValue("daiphunID",0);
 
-
-
     fountainServer aServer;
     SimpleSerialInterface asimpleSerialInterface;
     communicationChecker aCommuChecker;
@@ -41,7 +39,7 @@ int main(int argc, char *argv[])
     QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::errorsOcurred,&aServer,&fountainServer::serialDisconnectedHandler);
 
 
-   // QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::output,&aServer,&fountainServer::fromSerialHandler);
+    // QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::output,&aServer,&fountainServer::fromSerialHandler);
 
 
     foreach (QSerialPortInfo port, QSerialPortInfo::availablePorts()) {
@@ -69,12 +67,12 @@ int main(int argc, char *argv[])
     QObject::connect(&aCommuChecker,&communicationChecker::requestWifiInfo,&asimpleSerialInterface,&SimpleSerialInterface::input);
     QObject::connect(&aCommuChecker,&communicationChecker::wifiOK,&asimpleSerialInterface,&SimpleSerialInterface::input);
     QObject::connect(&aCommuChecker,&communicationChecker::wifiNotOK,&asimpleSerialInterface,&SimpleSerialInterface::input);
+    QObject::connect(&aCommuChecker,&communicationChecker::fountainStatus,&aServer,&fountainServer::fromCommunicationCheckerFountainStatusHandler);
+    QObject::connect(&aCommuChecker,&communicationChecker::toFountainServer,&aServer,&fountainServer::fromSerialHandler);
 
     aCommuChecker.start();
 
     tcpPackager::setFountainID(daiphunSetting.value("daiphunID").toInt());
-
-
 
     return a.exec();
 }

@@ -17,10 +17,10 @@ communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_
 
     QObject::connect(m_timeOutTimer, &QTimer::timeout, this,&communicationChecker::timerTimeoutHandler);
 
-//    m_HandShakeTimer->setSingleShot(false);
-//    QObject::connect(m_HandShakeTimer,&QTimer::timeout,this,&communicationChecker::S6HandShake);
-//    m_HandShakeTimer->setInterval(handShakeInterval);
-//    m_HandShakeTimer->start();
+    //    m_HandShakeTimer->setSingleShot(false);
+    //    QObject::connect(m_HandShakeTimer,&QTimer::timeout,this,&communicationChecker::S6HandShake);
+    //    m_HandShakeTimer->setInterval(handShakeInterval);
+    //    m_HandShakeTimer->start();
 
 }
 
@@ -75,12 +75,12 @@ void communicationChecker::S2RequestWifiInfo()
 
 void communicationChecker::S3ConnectWifi()
 {
-       QEventLoop loop;
-       QProcess *proc = new QProcess();
-       connect(proc, SIGNAL(finished(int)), &loop, SLOT(quit()));
-       proc->setEnvironment(QStringList() << "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:");
-       proc->start("/bin/bash", QStringList() << (QString)folderPath + "connectwifi.sh" << m_wifiID << m_wifiPassword);
-       loop.exec();
+    QEventLoop loop;
+    QProcess *proc = new QProcess();
+    connect(proc, SIGNAL(finished(int)), &loop, SLOT(quit()));
+    proc->setEnvironment(QStringList() << "PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:");
+    proc->start("/bin/bash", QStringList() << (QString)folderPath + "connectwifi.sh" << m_wifiID << m_wifiPassword);
+    loop.exec();
 
 #if communicationCheckerDebug
     QString output = proc->readAllStandardOutput();
@@ -96,8 +96,8 @@ void communicationChecker::S4RequestUserInputForWifi()
 {
 
     m_timeoutCounter = 0;
-//    emit requestUserInputForWifiInfo(fountainSerialPackager::fountainDeviceRequestUserInputForWifi());
-emit requestWifiInfo(fountainSerialPackager::fountainDeviceRequestWifi());
+    //    emit requestUserInputForWifiInfo(fountainSerialPackager::fountainDeviceRequestUserInputForWifi());
+    emit requestWifiInfo(fountainSerialPackager::fountainDeviceRequestWifi());
     m_timeOutTimer->stop();
     m_timeOutTimer->setInterval(requestTimeOutInterval);
     m_timeOutTimer->start();
@@ -160,42 +160,26 @@ void communicationChecker::in(const QByteArray &data)
 
     if(aPackage.isPackageValid())
     {
-
-        quint8 statusCode = aPackage.getStatusCode();
-
-        // lay thong tin WIFI
-        if(statusCode == m_Status_RequestWifi)
+        if(aPackage.getOpCode() == m_OpCode_FountainDeviceInternalHandShake) // HandShake
         {
-            m_wifiID = aPackage.getWifiName();
-            m_wifiPassword = aPackage.getWifiPassword();
+            quint8 statusCode = aPackage.getStatusCode();
+            if(statusCode == m_Status_RequestWifi)
+            {
+                m_wifiID = aPackage.getWifiName();
+                m_wifiPassword = aPackage.getWifiPassword();
 #if communicationCheckerDebug
-            qDebug() << "wifi Name: " + m_wifiID;
-            qDebug() << "wifi Password " + m_wifiPassword;
+                qDebug() << "wifi Name: " + m_wifiID;
+                qDebug() << "wifi Password " + m_wifiPassword;
 #endif
-            emit stateChanged(3);
-        }
-        // goi Tin Bat tay
-        else if(statusCode == m_Status_FountainDeviceHandShake)
-        {
-//            if(m_currentState == 5)
-//            {
-//                // Wifi OK - status code 0x03
-//                emit wifiOK(fountainSerialPackager::fountainDeviceWifiOK());
-//            }
-//            else
-//            {
-//                // Wifi khong OK - status code 0x00
-//                emit wifiNotOK(fountainSerialPackager::fountainDeviceWifiNotOK());
-//            }
+                emit stateChanged(3);
+            }
 
-        emit fountainStatus(true);
-        m_fountainTimeOutCounter = 0;
-
+            emit fountainStatus(true);
+            m_fountainTimeOutCounter = 0;
         }
         else
         {
-            // gui tra lai y chang neu khong dung voi cac statusCOde tren
-            emit wifiOK(data);
+            toFountainServer(data);
         }
     }
     else

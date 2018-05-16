@@ -49,6 +49,8 @@ public slots:
     void serialDisconnectedHandler();
     void clientDisconnectedHandler();
 
+    void fromCommunicationCheckerFountainStatusHandler(const bool &status);
+
 
 private slots:
     void readyReadHandler();

@@ -98,6 +98,7 @@ public:
     QString getWifiPassword();
 
     quint8 getStatusCode();
+    quint8 getOpCode();
 };
 
 #endif // FOUNTAINSERIALPACKAGER_H

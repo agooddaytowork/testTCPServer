@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include "tcppackager.h"
 
+
 fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this)), m_isFountainOnline(false), m_currentClientAddress("")
 {
 
@@ -52,6 +53,12 @@ void fountainServer::sendTcpPackageToClients(const QByteArray &tcpPackage)
     }
 
 
+}
+
+void fountainServer::fromCommunicationCheckerFountainStatusHandler(const bool &status)
+{
+    m_isFountainOnline = status;
+    sendTcpPackageToClients(tcpPackager::fountainStatus(m_isFountainOnline));
 }
 
 void fountainServer::newConnectionHandler()

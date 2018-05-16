@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QCryptographicHash>
 #include <QDateTime>
+#include <QElapsedTimer>
 
 #define theSecretKey "fountainController"
 class tcpPackager
@@ -33,6 +34,7 @@ public:
     static QByteArray AskWhoIsControlling();
     static void setFountainID(const int &id);
     static int getFountainID();
+    static void delayPerElectricalBox();
 
 
 

@@ -133,9 +133,8 @@ void SimpleSerialInterface::receivedDataHandler()
     if(aPackage.isPackageValid())
     {
         emit output(data);
-        input(data);
+//        input(data);
         data.clear();
-
     }
 
 }

@@ -1,7 +1,8 @@
 #include "fountainserialpackager.h"
 #include <QDebug>
+#include "tcppackager.h"
 
- fountainSerialPackager::fountainSerialPackager(QObject * parent): QObject(parent), m_OperationCode(0x00), m_PackageLength(0x00), m_BoxID(0x00), m_FOID(0x00), m_ProgramID(0x00),m_Repeat(0x00), m_StatusCode(0x00) ,m_IsPackageValid(true)
+fountainSerialPackager::fountainSerialPackager(QObject * parent): QObject(parent), m_OperationCode(0x00), m_PackageLength(0x00), m_BoxID(0x00), m_FOID(0x00), m_ProgramID(0x00),m_Repeat(0x00), m_StatusCode(0x00) ,m_IsPackageValid(true)
 {
     m_Data.clear();
 }
@@ -221,37 +222,37 @@ QByteArray fountainSerialPackager::setSyncModeForSingleFountainPerElectricalBox(
 
 QByteArray fountainSerialPackager::fountainDeviceHandshake()
 {
- fountainSerialPackager aPackage;
+    fountainSerialPackager aPackage;
 
- return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID(0x00).setData(m_Status_FountainDeviceHandShake).setPackageLength().generateSerialPackage();
+    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID((quint8) tcpPackager::getFountainID()).setFOID(0x00).setData(m_Status_FountainDeviceHandShake).setPackageLength().generateSerialPackage();
 }
 
 QByteArray fountainSerialPackager::fountainDeviceRequestUserInputForWifi()
 {
     fountainSerialPackager aPackage;
 
-    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID(0x00).setData(m_Status_RequestUserInputForWifi).setPackageLength().generateSerialPackage();
+    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID((quint8) tcpPackager::getFountainID()).setFOID(0x00).setData(m_Status_RequestUserInputForWifi).setPackageLength().generateSerialPackage();
 }
 
 QByteArray fountainSerialPackager::fountainDeviceWifiNotOK()
 {
     fountainSerialPackager aPackage;
 
-    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID(0x00).setData(0x00).setPackageLength().generateSerialPackage();
+    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID((quint8) tcpPackager::getFountainID()).setData(0x00).setPackageLength().generateSerialPackage();
 }
 
 QByteArray fountainSerialPackager::fountainDeviceRequestWifi()
 {
     fountainSerialPackager aPackage;
 
-    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID(0x00).setData(m_Status_RequestWifi).setPackageLength().generateSerialPackage();
+    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID((quint8) tcpPackager::getFountainID()).setFOID(0x00).setData(m_Status_RequestWifi).setPackageLength().generateSerialPackage();
 }
 
 QByteArray fountainSerialPackager::fountainDeviceWifiOK()
 {
     fountainSerialPackager aPackage;
 
-    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID(0x00).setData(m_Status_WifiOK).setPackageLength().generateSerialPackage();
+    return aPackage.setOpcode(m_OpCode_FountainDeviceInternalHandShake).setBoxID((quint8) tcpPackager::getFountainID()).setFOID(0x00).setData(m_Status_WifiOK).setPackageLength().generateSerialPackage();
 }
 
 bool fountainSerialPackager::isPackageValid()
@@ -279,28 +280,30 @@ void fountainSerialPackager::decodePackage(const QByteArray &data)
             case 3:
                 m_PackageLength = m_PackageLength | data[i];
 
-                if(m_PackageLength != (data.count() -1))
+                if(m_PackageLength != (data.count() -1) && data.at(data.count()-1) != m_stopFlag)
                 {
                     return;
                 }
-
                 break;
             case 4:
                 m_BoxID = data[i];
                 break;
             case 5:
-                m_StatusCode = data[i];
+                m_FOID = data[i];
                 break;
             default:
 
+                if(i == 6)
+                {
+                    m_StatusCode = data[i];
+                }
                 if(i != (data.count() -1))
                 {
-                m_Data.append(data[i]);
+                    m_Data.append(data[i]);
                 }
                 break;
             }
         }
-
         qDebug() << "package is valid";
         qDebug() << "Data: " + m_Data;
         m_IsPackageValid = true;
@@ -314,17 +317,21 @@ void fountainSerialPackager::decodePackage(const QByteArray &data)
 
 QString fountainSerialPackager::getWifiName()
 {
-return m_WifiName;
+    return m_WifiName;
 }
 
 QString fountainSerialPackager::getWifiPassword()
 {
-return m_WifiPassword;
+    return m_WifiPassword;
 }
 
 quint8 fountainSerialPackager::getStatusCode()
 {
- return m_StatusCode;
+    return m_StatusCode;
 }
 
+quint8 fountainSerialPackager::getOpCode()
+{
+    return m_OperationCode;
+}
 
