@@ -6,15 +6,21 @@
 #define requestTimeOutInterval 30000 // 30s
 #define requestTimeOutMaxCounter 3
 #define idleTimeOutInterval 120000 // 2 phut
+#define handShakeInterval 10000
 
 #include <QEventLoop>
 
-communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this))
+communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this)), m_HandShakeTimer(new QTimer(this))
 {
     QObject::connect(this,SIGNAL(stateChanged(int)),this,SLOT(stateChangedHandler(int)));
     m_timeOutTimer->setSingleShot(true);
 
     QObject::connect(m_timeOutTimer, &QTimer::timeout, this,&communicationChecker::timerTimeoutHandler);
+
+    m_HandShakeTimer->setSingleShot(false);
+    QObject::connect(m_HandShakeTimer,&QTimer::timeout,this,&communicationChecker::S6HandShake);
+    m_HandShakeTimer->setInterval(handShakeInterval);
+    m_HandShakeTimer->start();
 
 }
 
@@ -65,8 +71,6 @@ void communicationChecker::S2RequestWifiInfo()
     m_timeOutTimer->start();
 
 
-
-
 }
 
 void communicationChecker::S3ConnectWifi()
@@ -107,6 +111,11 @@ void communicationChecker::S5Idle()
     m_timeOutTimer->stop();
     m_timeOutTimer->setInterval(idleTimeOutInterval);
     m_timeOutTimer->start();
+}
+
+void communicationChecker::S6HandShake()
+{
+    emit wifiOK(fountainSerialPackager::fountainDeviceHandshake());
 }
 
 void communicationChecker::stateChangedHandler(const int &state)

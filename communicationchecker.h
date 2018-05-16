@@ -17,12 +17,14 @@ class communicationChecker: public QObject
     QString m_wifiID;
     QString m_wifiPassword;
     QTimer *m_timeOutTimer;
+    QTimer *m_HandShakeTimer;
 
     void S1CheckWifi();
     void S2RequestWifiInfo();
     void S3ConnectWifi();
     void S4RequestUserInputForWifi();
     void S5Idle();
+    void S6HandShake();
 
     bool isIPValid(const QString &IP);
 
@@ -45,6 +47,10 @@ signals:
     void requestUserInputForWifiInfo(const QByteArray &data);
     void wifiOK(const QByteArray &data);
     void wifiNotOK(const QByteArray &data);
+
+
+    // for fountainServer
+    void fountainOnline(const bool &status);
 
 
 };

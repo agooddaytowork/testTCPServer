@@ -16,10 +16,13 @@
 #define  m_OpCode_setAllProgramsSingleFountain                      0x06
 #define  m_OpCode_FountainDeviceInternalHandShake                   0x00
 #define  m_Status_FountainDeviceHandShake                           0x01
-#define  m_Status_WifiOK                                            0x03
-//#define  m_Status_VPNOK                                             0x04
-#define  m_Status_RequestWifi                                       0x04
+#define  m_Status_WifiOK                                            0x01
+#define  m_Stauus_WifiNoTOK                                         0x00
+//#define  m_Status_VPNOK                                           0x04
+#define  m_Status_RequestWifi                                       0x02
 #define  m_Status_RequestUserInputForWifi                           0x08
+#define  m_Status_ControlDevicesConnectedToPi                       0x05
+
 
 class fountainSerialPackager : public QObject
 {
@@ -74,6 +77,7 @@ public:
     Q_INVOKABLE QByteArray setOperationModeFountainsPerElectricalBOx(const quint8 & Box_ID, const QByteArray &operationMode);
     Q_INVOKABLE QByteArray setSpeedSingleProgramPerFountain(const quint8 &Box_ID, const quint8 &FO_ID, const quint8 &Program_ID, const quint8 &speed);
     Q_INVOKABLE QByteArray setSpeedAllProgramsPerFountain(const quint8 &Box_ID, const quint8 &FO_ID, const QByteArray &speeds);
+    Q_INVOKABLE QByteArray setProgramEffectForSingleFountain(const quint8 &Box_ID, const quint8 &FO_ID, const quint8  &Program_ID, const quint8 &effectID, const quint8 &speed, const quint8 &repeat);
 
     static QByteArray fountainDeviceHandshake();
     static QByteArray fountainDeviceWifiOK();
