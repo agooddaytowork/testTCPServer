@@ -8,6 +8,8 @@
 #define idleTimeOutInterval 10000 // 2 phut
 #define deviceTimeOutCounterThreshold 6
 
+#define checkActualFountainDeviceOnlineStatus (0)
+
 #include <QEventLoop>
 
 communicationChecker::communicationChecker(QObject *parent): QObject(parent), m_currentState(1), m_timeoutCounter(0), m_timeOutTimer(new QTimer(this)), m_fountainTimeOutCounter(0)
@@ -173,8 +175,10 @@ void communicationChecker::in(const QByteArray &data)
 #endif
                 emit stateChanged(3);
             }
+#if checkActualFountainDeviceOnlineStatus
+         emit fountainStatus(true);
+#endif
 
-            emit fountainStatus(true);
             m_fountainTimeOutCounter = 0;
         }
         else
@@ -214,7 +218,11 @@ void communicationChecker::timerTimeoutHandler()
 {
     if(m_fountainTimeOutCounter >= deviceTimeOutCounterThreshold)
     {
+
+#if checkActualFountainDeviceOnlineStatus
         emit fountainStatus(false);
+
+#endif
     }
 
     if(m_currentState == 2)
@@ -230,6 +238,9 @@ void communicationChecker::timerTimeoutHandler()
     else if(m_currentState == 5)
     {
         m_timeoutCounter++;
+#if !checkActualFountainDeviceOnlineStatus
+         emit fountainStatus(true);
+#endif
         emit stateChanged(1);
     }
 
