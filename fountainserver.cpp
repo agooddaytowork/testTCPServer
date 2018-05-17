@@ -253,7 +253,7 @@ void fountainServer::readyReadHandler()
 
     if(isDisconnecting)
     {
-        tcpSocketList.removeOne(theClient);
+        tcpSocketList.removeAll(theClient);
     }
 }
 
