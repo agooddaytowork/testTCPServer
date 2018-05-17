@@ -143,7 +143,7 @@ void SimpleSerialInterface::receivedDataHandler()
     {
         tryCounter ++;
     }
-    if(tryCounter == 5)
+    if(tryCounter == 3)
     {
         data.clear();
         tryCounter = 0;

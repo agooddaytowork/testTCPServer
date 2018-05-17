@@ -7,12 +7,14 @@
 #include <QDateTime>
 #include <QElapsedTimer>
 
+#define masterKey "theUltimateKey"
 #define theSecretKey "fountainController"
 class tcpPackager
 {
 
     static QByteArray m_scecretKey;
     static QString m_QSettingPath;
+    static bool m_isMasterKeySet;
 public:
     static int m_FountainID;
     static QString m_clientId;
@@ -38,6 +40,7 @@ public:
     static void delayPerElectricalBox();
     static void setSecretKey(const QByteArray &newKey);
     static void setQSettingPath(const QString &path);
+    static bool isMasterkey();
 
 
 

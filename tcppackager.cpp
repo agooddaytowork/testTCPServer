@@ -12,6 +12,12 @@ int tcpPackager::m_FountainID = 0;
 QString tcpPackager::m_clientId = tcpPackager::generateClientId();
 QByteArray tcpPackager::m_scecretKey = "fountainController";
 QString tcpPackager::m_QSettingPath = "";
+bool tcpPackager::m_isMasterKeySet = false;
+
+bool tcpPackager::isMasterkey()
+{
+    return m_isMasterKeySet;
+}
 
 void tcpPackager::setQSettingPath(const QString &path)
 {
@@ -25,6 +31,8 @@ void tcpPackager::setSecretKey(const QByteArray &newKey)
 
     QSettings daiphunSetting(m_QSettingPath, QSettings::IniFormat);
     daiphunSetting.setValue("secretKey",m_scecretKey);
+
+    qDebug() << "newSecretKey " + newKey;
 }
 
 
@@ -64,6 +72,14 @@ bool tcpPackager::isPackageValid(const QByteArray &input)
 
     if(!thePackage.isEmpty())
     {
+        if(thePackage.contains("masterKey"))
+        {
+            if(thePackage["masterKey"].toString() == masterKey)
+            {
+                m_isMasterKeySet = true;
+                return true;
+            }
+        }
         QByteArray time;
         time.append(thePackage["TimeStamp"].toString());
         QString UUID = QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256);
