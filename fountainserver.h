@@ -14,6 +14,7 @@
 #include <QTimer>
 
 
+
 class fountainServer: public QObject
 {
     Q_OBJECT
@@ -50,6 +51,7 @@ public slots:
     void clientDisconnectedHandler();
 
     void fromCommunicationCheckerFountainStatusHandler(const bool &status);
+    void socketErrorHandler();
 
 
 private slots:

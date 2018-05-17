@@ -83,10 +83,22 @@ void fountainServer::newConnectionHandler()
 
     connect(newClient, SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
     connect(newClient,SIGNAL(disconnected()),this,SLOT(clientDisconnectedHandler()));
+    connect(newClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(socketErrorHandler()));
+
     informClientFountainStatus();
 
 }
 
+
+void fountainServer::socketErrorHandler()
+{
+    if(auto client = dynamic_cast<QTcpSocket *>(sender()))
+    {
+        tcpSocketList.removeAll(client);
+
+        qDebug() << "remove disconnectedClient";
+    }
+}
 void fountainServer::clientDisconnectedHandler(){
 
     if(auto client = dynamic_cast<QTcpSocket *>(sender()))
