@@ -124,19 +124,29 @@ void SimpleSerialInterface::receivedDataHandler()
 {
     QByteArray tmpdata;
     static QByteArray data;
+    static quint8 tryCounter = 0;
 
     tmpdata = mSerialPort.readAll();
     data +=tmpdata;
-
+    qDebug() << data;
     fountainSerialPackager aPackage(data);
 
     if(aPackage.isPackageValid())
     {
 
-        qDebug() << data;
+
         emit output(data);
 //        input(data);
         data.clear();
+    }
+    else
+    {
+        tryCounter ++;
+    }
+    if(tryCounter == 5)
+    {
+        data.clear();
+        tryCounter = 0;
     }
 
 }

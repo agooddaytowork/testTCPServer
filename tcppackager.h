@@ -11,7 +11,8 @@
 class tcpPackager
 {
 
-
+    static QByteArray m_scecretKey;
+    static QString m_QSettingPath;
 public:
     static int m_FountainID;
     static QString m_clientId;
@@ -35,6 +36,9 @@ public:
     static void setFountainID(const int &id);
     static int getFountainID();
     static void delayPerElectricalBox();
+    static void setSecretKey(const QByteArray &newKey);
+    static void setQSettingPath(const QString &path);
+
 
 
 

@@ -1,5 +1,6 @@
 #include "tcppackager.h"
 #include <QDebug>
+#include <QSettings>
 
 tcpPackager::tcpPackager()
 {
@@ -9,14 +10,28 @@ tcpPackager::tcpPackager()
 int tcpPackager::m_FountainID = 0;
 
 QString tcpPackager::m_clientId = tcpPackager::generateClientId();
-QString tcpPackager::generateClientId()
-{
+QByteArray tcpPackager::m_scecretKey = "fountainController";
+QString tcpPackager::m_QSettingPath = "";
 
-    return (QString) QCryptographicHash::hash("clientId" + QByteArray::number(QDateTime::currentMSecsSinceEpoch()),QCryptographicHash::Sha256);
+void tcpPackager::setQSettingPath(const QString &path)
+{
+    m_QSettingPath = path;
 
 }
 
+void tcpPackager::setSecretKey(const QByteArray &newKey)
+{
+    m_scecretKey = newKey;
 
+    QSettings daiphunSetting(m_QSettingPath, QSettings::IniFormat);
+    daiphunSetting.setValue("secretKey",m_scecretKey);
+}
+
+
+QString tcpPackager::generateClientId()
+{
+    return (QString) QCryptographicHash::hash("clientId" + QByteArray::number(QDateTime::currentMSecsSinceEpoch()),QCryptographicHash::Sha256);
+}
 
 
 
@@ -31,7 +46,7 @@ QByteArray tcpPackager::playProgram(const QString &programName, const QByteArray
     thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("ClientId", m_clientId);
     thePackage.insert("ClientType", m_clientType);
-    thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
+    thePackage.insert("UUID", (QString) QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "playProgram");
     thePackage.insert("ProgramName", programName);
@@ -51,7 +66,7 @@ bool tcpPackager::isPackageValid(const QByteArray &input)
     {
         QByteArray time;
         time.append(thePackage["TimeStamp"].toString());
-        QString UUID = QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256);
+        QString UUID = QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256);
 
         if (UUID == thePackage["UUID"].toString())
         {
@@ -79,7 +94,7 @@ QByteArray tcpPackager::isFountainOnline()
     thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("ClientId", m_clientId);
     thePackage.insert("ClientType", m_clientType);
-    thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
+    thePackage.insert("UUID", (QString) QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "isFountainOnline");
 
@@ -96,7 +111,7 @@ QByteArray tcpPackager::fountainResponse(const QByteArray &response)
     QByteArray time;
     time.append(QString::number(theTimeStamp));
     thePackage.insert("fountainId", m_FountainID);
-    thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
+    thePackage.insert("UUID", (QString) QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "fountainResponse");
     thePackage.insert("Data", (QString) response.toHex());
@@ -113,7 +128,7 @@ QByteArray tcpPackager::fountainStatus(const bool &status)
     QByteArray time;
     time.append(QString::number(theTimeStamp));
     thePackage.insert("fountainId", m_FountainID);
-    thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
+    thePackage.insert("UUID", (QString) QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "fountainStatus");
     thePackage.insert("Data", status);
@@ -131,7 +146,7 @@ QByteArray tcpPackager::fountainCurrentPlayingProgram(const QString &program)
     QByteArray time;
     time.append(QString::number(theTimeStamp));
     thePackage.insert("fountainId", m_FountainID);
-    thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
+    thePackage.insert("UUID", (QString) QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "fountainCurrentPlayingProgram");
     thePackage.insert("Data", program);
@@ -148,7 +163,7 @@ QByteArray tcpPackager::AnswerWhoIsControlling(const QString &clientId, const in
     QByteArray time;
     time.append(QString::number(theTimeStamp));
     thePackage.insert("fountainId", m_FountainID);
-    thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
+    thePackage.insert("UUID", (QString) QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "whoIsControlling");
     thePackage.insert("ClientId", clientId);
@@ -167,7 +182,7 @@ QByteArray tcpPackager::AskWhoIsControlling()
     thePackage.insert("fountainId", m_FountainID);
     thePackage.insert("ClientId", m_clientId);
     thePackage.insert("ClientType", m_clientType);
-    thePackage.insert("UUID", (QString) QCryptographicHash::hash(theSecretKey + time, QCryptographicHash::Sha256));
+    thePackage.insert("UUID", (QString) QCryptographicHash::hash(m_scecretKey + time, QCryptographicHash::Sha256));
     thePackage.insert("TimeStamp",QString::number(theTimeStamp) );
     thePackage.insert("Command", "whoIsControlling");
 

@@ -236,6 +236,11 @@ void fountainServer::readyReadHandler()
                 }
             }
         }
+        else if(theCommand == "updateSecretKey")
+        {
+               tcpPackager::setSecretKey(requestJsonObject["key"].toString().toUtf8());
+               emit sendTcpPackageToClients(tcpPackager::fountainCurrentPlayingProgram("updateSecretKey"));
+        }
     }
 
     if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();

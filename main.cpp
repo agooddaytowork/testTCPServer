@@ -13,12 +13,15 @@ int main(int argc, char *argv[])
 
     // setup Application Setting
     qDebug() << QCoreApplication::applicationDirPath()+"/daiphunnuoc.ini";
-
+    tcpPackager::setQSettingPath(QCoreApplication::applicationDirPath()+"/daiphunnuoc.ini");
     QSettings daiphunSetting(QCoreApplication::applicationDirPath()+"/daiphunnuoc.ini", QSettings::IniFormat);
 
     if(!daiphunSetting.contains("portName")) daiphunSetting.setValue("portName", "ttyUSB0");
     if(!daiphunSetting.contains("baudRate")) daiphunSetting.setValue("baudRate", 19200);
     if(!daiphunSetting.contains("daiphunID")) daiphunSetting.setValue("daiphunID",0);
+    if(!daiphunSetting.contains("secretKey")) daiphunSetting.setValue("secretKey","fountainController");
+
+    tcpPackager::setSecretKey(daiphunSetting.value("secretKey").toByteArray());
 
     fountainServer aServer;
     SimpleSerialInterface asimpleSerialInterface;
