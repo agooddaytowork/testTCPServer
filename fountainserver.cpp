@@ -93,7 +93,7 @@ void fountainServer::clientDisconnectedHandler(){
     {
         tcpSocketList.removeAll(client);
 
-        QDebug() << "remove disconnectedClient";
+        qDebug() << "remove disconnectedClient";
     }
 }
 
@@ -101,6 +101,8 @@ void fountainServer::readyReadHandler()
 {
 
     QTcpSocket* theClient = dynamic_cast<QTcpSocket *> (sender());
+
+    bool isDisconnecting = false;
 
     if(theClient)
     {
@@ -162,7 +164,8 @@ void fountainServer::readyReadHandler()
                 sendTcpPackageToClients(requestFromClient);
             }
 
-            tcpSocketList.removeAll(theClient);
+            isDisconnecting = true;
+
         }
         else if(theCommand =="addNewClient")
         {
@@ -248,6 +251,10 @@ void fountainServer::readyReadHandler()
 
     if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();
 
+    if(isDisconnecting)
+    {
+        tcpSocketList.removeOne(theClient);
+    }
 }
 
 
