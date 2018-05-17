@@ -280,7 +280,7 @@ void fountainSerialPackager::decodePackage(const QByteArray &data)
             case 3:
                 m_PackageLength = m_PackageLength | data[i];
 
-                if(m_PackageLength != (data.count() -1) && data.at(data.count()-1) != m_stopFlag)
+                if(m_PackageLength != (data.count() -1) && data[data.count()-1] != m_stopFlag)
                 {
                     return;
                 }
@@ -317,11 +317,32 @@ void fountainSerialPackager::decodePackage(const QByteArray &data)
 
 QString fountainSerialPackager::getWifiName()
 {
+
+    m_WifiName.clear();
+    int i = 1;
+
+    while (m_Data[i] != 0x1B && i < m_Data.count()) {
+
+        m_WifiName.append(m_Data[i]);
+        i++;
+    }
     return m_WifiName;
 }
 
 QString fountainSerialPackager::getWifiPassword()
 {
+
+    m_WifiPassword.clear();
+    int i = 1;
+    while (m_Data[i] != 0x1B && i < m_Data.count()) {
+        i++;
+    }
+    i++;
+    for(i; i < m_Data.count(); i++)
+    {
+        m_WifiPassword.append(m_Data[i]);
+    }
+
     return m_WifiPassword;
 }
 
