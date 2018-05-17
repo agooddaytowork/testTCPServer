@@ -132,6 +132,8 @@ void SimpleSerialInterface::receivedDataHandler()
 
     if(aPackage.isPackageValid())
     {
+
+        qDebug() << data;
         emit output(data);
 //        input(data);
         data.clear();

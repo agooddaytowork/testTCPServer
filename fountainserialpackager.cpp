@@ -323,7 +323,7 @@ QString fountainSerialPackager::getWifiName()
 
     while (m_Data[i] != 0x1B && i < m_Data.count()) {
 
-        m_WifiName.append(m_Data[i]);
+        m_WifiName.append(m_Data.at(i));
         i++;
     }
     return m_WifiName;
@@ -340,7 +340,7 @@ QString fountainSerialPackager::getWifiPassword()
     i++;
     for(i; i < m_Data.count(); i++)
     {
-        m_WifiPassword.append(m_Data[i]);
+        m_WifiPassword.append(m_Data.at(i));
     }
 
     return m_WifiPassword;

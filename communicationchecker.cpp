@@ -174,6 +174,7 @@ void communicationChecker::in(const QByteArray &data)
                 qDebug() << "wifi Password " + m_wifiPassword;
 #endif
                 emit stateChanged(3);
+                emit wifiOK(data);
             }
 #if checkActualFountainDeviceOnlineStatus
          emit fountainStatus(true);
