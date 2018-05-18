@@ -83,7 +83,7 @@ void fountainServer::newConnectionHandler()
 
     connect(newClient, SIGNAL(readyRead()),this,SLOT(readyReadHandler()));
     connect(newClient,SIGNAL(disconnected()),this,SLOT(clientDisconnectedHandler()));
-    connect(newClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(socketErrorHandler()));
+    connect(newClient,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(socketErrorHandler(QAbstractSocket::SocketError)));
 
     informClientFountainStatus();
 

@@ -70,8 +70,10 @@ bool tcpPackager::isPackageValid(const QByteArray &input)
     delayPerElectricalBox();
     QJsonObject thePackage = packageToJson(input);
 
+
     if(!thePackage.isEmpty())
     {
+        qDebug() << "Master Key";
         if(thePackage.contains("masterKey"))
         {
             if(thePackage["masterKey"].toString() == masterKey)
@@ -86,8 +88,10 @@ bool tcpPackager::isPackageValid(const QByteArray &input)
 
         if (UUID == thePackage["UUID"].toString())
         {
+             qDebug() << "UUID correct, package valid";
             return true;
         }
+        qDebug() << "UUID wrong, package invalid";
     }
     return false;
 }
