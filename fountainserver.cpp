@@ -90,8 +90,9 @@ void fountainServer::newConnectionHandler()
 }
 
 
-void fountainServer::socketErrorHandler()
+void fountainServer::socketErrorHandler(QAbstractSocket::SocketError error)
 {
+    qDebug() << "Socket error:" + error;
     if(auto client = dynamic_cast<QTcpSocket *>(sender()))
     {
         tcpSocketList.removeAll(client);

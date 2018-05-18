@@ -43,8 +43,6 @@ int main(int argc, char *argv[])
 
 
     // QObject::connect(&asimpleSerialInterface,&SimpleSerialInterface::output,&aServer,&fountainServer::fromSerialHandler);
-
-
     foreach (QSerialPortInfo port, QSerialPortInfo::availablePorts()) {
         qDebug() << port.portName();
         if(port.portName() == "ttyUSB0")
@@ -55,7 +53,6 @@ int main(int argc, char *argv[])
             if(asimpleSerialInterface.connect())
             {
                 qDebug() << "Serial connected";
-
             }
             else
             {
@@ -64,6 +61,7 @@ int main(int argc, char *argv[])
         }
 
     }
+
 
     QObject::connect(&asimpleSerialInterface, &SimpleSerialInterface::output, &aCommuChecker, &communicationChecker::in);
     QObject::connect(&aCommuChecker,&communicationChecker::requestUserInputForWifiInfo,&asimpleSerialInterface,&SimpleSerialInterface::input);

@@ -7,7 +7,7 @@
 #include <QDataStream>
 #include <QList>
 #include "clienttcpsocket.h"
-
+#include <QAbstractSocket>
 #define fountainServerDebug (1)
 #define fountainServerForwarder (0)
 #define fountainDeviceMode (1)
@@ -51,7 +51,7 @@ public slots:
     void clientDisconnectedHandler();
 
     void fromCommunicationCheckerFountainStatusHandler(const bool &status);
-    void socketErrorHandler();
+    void socketErrorHandler(QAbstractSocket::SocketError error);
 
 
 private slots:
