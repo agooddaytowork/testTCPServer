@@ -295,10 +295,10 @@ void fountainServer::readyReadHandler()
 
     if(tcpSocketList.last()->bytesAvailable()>0)    emit stillAvailable();
 
-    if(isDisconnecting)
-    {
-        tcpSocketList.removeAll(theTCPClient);
-    }
+//    if(isDisconnecting)
+//    {
+//        tcpSocketList.removeAll(theTCPClient);
+//    }
 }
 
 
