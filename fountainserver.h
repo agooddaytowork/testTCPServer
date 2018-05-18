@@ -12,6 +12,7 @@
 #define fountainServerForwarder (0)
 #define fountainDeviceMode (1)
 #include <QTimer>
+#define pollingInterval 300
 
 
 
@@ -32,6 +33,7 @@ class fountainServer: public QObject
     QString m_currentClientAddress;
     bool m_isFountainOnline;
     bool isClientExist(const QString &id);
+    QTimer *m_IntervalTimer;
 
 
 public:

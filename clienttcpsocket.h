@@ -12,8 +12,10 @@ class clientTcpSocket
     bool m_isControlling;
     bool m_isMainController;
     QString m_Address;
+
 public:
 
+    QTcpSocket* m_clientSocket;
     clientTcpSocket();
     void setClientId(const QString &id);
     QString getClientId() const;

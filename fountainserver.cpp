@@ -6,18 +6,23 @@
 #include "tcppackager.h"
 
 
-fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this)), m_isFountainOnline(false), m_currentClientAddress("")
+fountainServer::fountainServer(QObject *parent): QObject(parent), tcpSocket(new QTcpSocket(this)), m_isFountainOnline(false), m_currentClientAddress(""), m_IntervalTimer(new QTimer(this))
 {
 
     tcpServer = new QTcpServer(this);
+    m_IntervalTimer->setInterval(pollingInterval);
+    m_IntervalTimer->setSingleShot(false);
 
     if(tcpServer->listen(QHostAddress(QHostAddress::Any),8080))
     {
         qDebug() << "DZOO";
         connect(tcpServer,SIGNAL(newConnection()),this,SLOT(newConnectionHandler()));
+
+        m_IntervalTimer->start();
     }
 
     QObject::connect(this,SIGNAL(stillAvailable()),this,SLOT(readyReadHandler()));
+
 
 }
 
@@ -98,10 +103,9 @@ void fountainServer::socketErrorHandler(QAbstractSocket::SocketError error)
     if(auto client = dynamic_cast<QTcpSocket *>(sender()))
     {
 
-        int number =0;
-        number = tcpSocketList.removeAll(client);
+        tcpSocketList.removeOne(client);
 
-        qDebug() << "remove disconnectedClient" + QString::number(number);
+        qDebug() << "remove disconnectedClient";
     }
 }
 void fountainServer::clientDisconnectedHandler(){
@@ -109,22 +113,37 @@ void fountainServer::clientDisconnectedHandler(){
     if(auto client = dynamic_cast<QTcpSocket *>(sender()))
     {
        bool status = false;
-        status = tcpSocketList.removeOne(client);
+        tcpSocketList.removeOne(client);
 
-        qDebug() << "remove disconnectedClient :" + QString(status);
+        qDebug() << "remove disconnectedClient :" + status;
     }
 }
 
 void fountainServer::readyReadHandler()
 {
+    static int counter = 0;
 
-    QTcpSocket* theClient = dynamic_cast<QTcpSocket *> (sender());
+    if(counter == 5)
+    {
+        m_IntervalTimer->stop();
+        counter =0;
+    }
+    if(counter == 0)
+    {
+        m_IntervalTimer->start();
+    }
+
+    counter++;
+
+
+
+    QTcpSocket* theTCPClient = dynamic_cast<QTcpSocket *> (sender());
 
     bool isDisconnecting = false;
 
-    if(theClient)
+    if(theTCPClient)
     {
-        in.setDevice(theClient);
+        in.setDevice(theTCPClient);
     }
 
     in.startTransaction();
@@ -138,6 +157,7 @@ void fountainServer::readyReadHandler()
 
     if(tcpPackager::isPackageValid(requestFromClient))
     {
+        counter = 0;
         QJsonObject requestJsonObject = tcpPackager::packageToJson(requestFromClient);
 
         QString theCommand = requestJsonObject["Command"].toString();
@@ -195,8 +215,13 @@ void fountainServer::readyReadHandler()
             if(clientList.count() != 0)
             {
                 foreach (clientTcpSocket theClient, clientList) {
-                    if(theClient.getClientId() == requestJsonObject["ClientId"].toString()) clientExist = true;
+                    if(theClient.getClientId() == requestJsonObject["ClientId"].toString())
+                    {
+                        clientExist = true;
+                        theClient.m_clientSocket = theTCPClient;
+                    }
                 }
+
             }
             if(!clientExist)
             {
@@ -207,6 +232,7 @@ void fountainServer::readyReadHandler()
                 aClient.setClientId(requestJsonObject["ClientId"].toString());
                 aClient.setClientType(requestJsonObject["ClientType"].toInt());
                 aClient.setClientAddress(m_currentClientAddress);
+                aClient.m_clientSocket = theTCPClient;
                 clientList.append(aClient);
             }
 
@@ -271,7 +297,7 @@ void fountainServer::readyReadHandler()
 
     if(isDisconnecting)
     {
-        tcpSocketList.removeAll(theClient);
+        tcpSocketList.removeAll(theTCPClient);
     }
 }
 
