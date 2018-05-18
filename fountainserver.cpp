@@ -93,20 +93,25 @@ void fountainServer::newConnectionHandler()
 void fountainServer::socketErrorHandler(QAbstractSocket::SocketError error)
 {
     qDebug() << "Socket error:" + error;
+
+     //tcpSocketList.clear();
     if(auto client = dynamic_cast<QTcpSocket *>(sender()))
     {
-        tcpSocketList.removeAll(client);
 
-        qDebug() << "remove disconnectedClient";
+        int number =0;
+        number = tcpSocketList.removeAll(client);
+
+        qDebug() << "remove disconnectedClient" + QString::number(number);
     }
 }
 void fountainServer::clientDisconnectedHandler(){
 
     if(auto client = dynamic_cast<QTcpSocket *>(sender()))
     {
-        tcpSocketList.removeAll(client);
+       bool status = false;
+        status = tcpSocketList.removeOne(client);
 
-        qDebug() << "remove disconnectedClient";
+        qDebug() << "remove disconnectedClient :" + QString(status);
     }
 }
 
